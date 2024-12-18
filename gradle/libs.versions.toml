@@ -1,0 +1,85 @@
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+coreKtx = "1.15.0"
+junit = "4.13.2"
+#noinspection GradleDependency
+junitVersion = "1.1.5"
+#noinspection GradleDependency
+espressoCore = "3.5.1"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
+composeBom = "2024.12.01"
+uiTextGoogleFonts = "1.7.6"
+appcompat = "1.7.0"
+datastorePreferences = "1.1.1"
+#noinspection GradleDependency
+ksp = "2.0.21-1.0.28"
+koin = "4.0.0"
+koin-annotations = "2.0.0-Beta1"
+landscapist = "2.4.4"
+coilCompose = "3.0.4"
+orbitMvi = "9.0.0"
+okhttpBom = "4.12.0"
+ktor = "3.0.1"
+ktorfit = "2.2.0"
+sandwich = "2.0.10"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-appcompat-resources = { group = "androidx.appcompat", name = "appcompat-resources", version.ref = "appcompat" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+# koin dependency injection
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
+koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations" }
+# networking
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
+ktorfit-converter-responses = { module = "de.jensklingenberg.ktorfit:ktorfit-converters-response", version.ref = "ktorfit" }
+ktorfit-converter-call = { module = "de.jensklingenberg.ktorfit:ktorfit-converters-call", version.ref = "ktorfit" }
+ktorfit-converter-flow = { module = "de.jensklingenberg.ktorfit:ktorfit-converters-flow", version.ref = "ktorfit" }
+sandwich = { group = "com.github.skydoves", name = "sandwich", version.ref = "sandwich" }
+sandwich-ktorfit = { group = "com.github.skydoves", name = "sandwich-ktorfit", version.ref = "sandwich" }
+okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttpBom" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+okhttp-loggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+# network image resource
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilCompose" }
+landscapist-coil = { group = "com.github.skydoves", name = "landscapist-coil3", version.ref = "landscapist" }
+# orbit mvi
+orbitMvi-core = { group = "org.orbit-mvi", name = "orbit-core", version.ref = "orbitMvi" }
+orbitMvi-viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "orbitMvi" }
+orbitMvi-compose = { group = "org.orbit-mvi", name = "orbit-compose", version.ref = "orbitMvi" }
+orbitMvi-test = { group = "org.orbit-mvi", name = "orbit-test", version.ref = "orbitMvi" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
