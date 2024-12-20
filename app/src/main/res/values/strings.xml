@@ -14,4 +14,6 @@
     <string name="err_general_trouble">Uh oh! Something went wrong…</string>
     <string name="err_signup_trouble">Failed to create account. Something went wrong.</string>
     <string name="signup_success">Your account successfully created. Please sign in to continue.</string>
+    <string name="onboarding_headline">Welcome to Dicoding Story!</string>
+    <string name="onboarding_sub_headline">Want to share knowledge about Android, iOS, Machine Learning, Cloud, Front-end, Back-end, and other IT fields? Just do it on Dicoding Story!</string>
 </resources>

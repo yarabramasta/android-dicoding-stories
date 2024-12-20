@@ -14,13 +14,12 @@ class IconResource private constructor(
 
   @Composable
   fun asPainterResource(): Painter {
-    resID?.let {
-      return painterResource(id = resID)
-    }
+    resID?.let { return painterResource(id = resID) }
     return rememberVectorPainter(image = imageVector!!)
   }
 
   companion object {
+    @Suppress("unused")
     fun fromDrawableResource(@DrawableRes resID: Int): IconResource {
       return IconResource(resID, null)
     }

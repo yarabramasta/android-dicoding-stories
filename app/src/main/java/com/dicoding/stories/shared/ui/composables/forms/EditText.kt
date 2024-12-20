@@ -61,11 +61,17 @@ fun EditText(
     trailingIcon = if (isPasswordField) {
       {
         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-          Icon(
-            imageVector = if (passwordVisible) Icons.Outlined.Visibility
-            else Icons.Outlined.VisibilityOff,
-            contentDescription = if (passwordVisible) "Hide password" else "Show password"
-          )
+          IconResource.fromImageVector(
+            if (passwordVisible) Icons.Outlined.Visibility
+            else Icons.Outlined.VisibilityOff
+          ).let {
+            Icon(
+              it.asPainterResource(),
+              contentDescription =
+              if (passwordVisible) "Hide password"
+              else "Show password",
+            )
+          }
         }
       }
     } else if (isError) {

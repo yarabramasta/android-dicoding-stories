@@ -14,4 +14,6 @@
     <string name="err_general_trouble">Terjadi masalah…</string>
     <string name="err_signup_trouble">Gagal membuat akun. Terjadi masalah.</string>
     <string name="signup_success">Akun Anda berhasil dibuat. Masuk untuk melanjutkan.</string>
+    <string name="onboarding_headline">Selamat datang di Dicoding Story!</string>
+    <string name="onboarding_sub_headline">Mau berbagi ilmu tentang Android, iOS, Machine Learning, Cloud, Front-end, Back-end, dan bidang IT lainnya? Di Dicoding Story aja!</string>
 </resources>
