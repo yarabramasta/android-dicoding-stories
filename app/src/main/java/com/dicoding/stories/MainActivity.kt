@@ -25,9 +25,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dicoding.stories.features.auth.presentation.screens.OnboardingScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignInScreen
+import com.dicoding.stories.features.auth.presentation.screens.SignUpScreen
 import com.dicoding.stories.features.auth.presentation.viewmodel.auth.AuthViewModel
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInViewModel
+import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
+import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
 import com.dicoding.stories.shared.ui.navigation.AppRoutes
@@ -63,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         ) {
           addOnboarding(navController = navController)
           addSignIn(navController = navController)
+          addSignUp(navController = navController)
           addMain()
         }
       }
@@ -111,9 +115,43 @@ private fun NavGraphBuilder.addSignIn(navController: NavHostController) {
         }
       },
       onBack = {
-        navController.navigate(AppRoutes.Onboarding) {
-          popUpTo(AppRoutes.Onboarding) { inclusive = true }
+        navController.popBackStack()
+      }
+    )
+  }
+}
+
+private fun NavGraphBuilder.addSignUp(navController: NavHostController) {
+  composable<AppRoutes.SignUp> {
+    val context = LocalContext.current
+
+    val signUpViewModel = hiltViewModel<SignUpViewModel>()
+    val state by signUpViewModel.collectAsState()
+
+    signUpViewModel.collectSideEffect { effect ->
+      when (effect) {
+        SignUpSideEffect.OnSubmitSuccessNavigate -> {
+          navController.navigate(AppRoutes.SignIn) {
+            popUpTo(AppRoutes.SignIn) { inclusive = true }
+          }
         }
+
+        is SignUpSideEffect.ShowToast -> {
+          context.showToast(effect.message)
+        }
+      }
+    }
+
+    SignUpScreen(
+      state = state,
+      onNameChanged = signUpViewModel::onNameChanged,
+      onEmailChanged = signUpViewModel::onEmailChanged,
+      onPasswordChanged = signUpViewModel::onPasswordChanged,
+      onSubmit = {
+        signUpViewModel.onSubmit(context)
+      },
+      onBack = {
+        navController.popBackStack()
       }
     )
   }

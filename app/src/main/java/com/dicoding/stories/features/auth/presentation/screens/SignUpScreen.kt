@@ -12,33 +12,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.dicoding.stories.R
 import com.dicoding.stories.features.auth.presentation.atoms.AuthFormLayout
-import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInFormState
-import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInState
+import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpFormState
+import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpState
 import com.dicoding.stories.shared.ui.composables.forms.EditText
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
 
 @Composable
-fun SignInScreen(
-  state: SignInState,
+fun SignUpScreen(
+  state: SignUpState,
+  onNameChanged: (String) -> Unit,
   onEmailChanged: (String) -> Unit,
   onPasswordChanged: (String) -> Unit,
   onSubmit: () -> Unit,
   onBack: () -> Unit,
 ) {
   AuthFormLayout(
-    headline = UiText.StringResource(R.string.sign_in_headline),
-    subHeadline = UiText.StringResource(R.string.sign_in_sub_headline),
+    headline = UiText.StringResource(R.string.sign_up_headline),
+    subHeadline = UiText.StringResource(R.string.sign_up_sub_headline),
     onBack = onBack
   ) {
     buildForm(
       loading = state.status is UiStatus.Loading,
       formState = state.formState,
+      onNameChanged = onNameChanged,
       onEmailChanged = onEmailChanged,
       onPasswordChanged = onPasswordChanged,
       onSubmit = onSubmit
@@ -48,11 +51,28 @@ fun SignInScreen(
 
 private fun LazyListScope.buildForm(
   loading: Boolean,
-  formState: SignInFormState,
+  formState: SignUpFormState,
+  onNameChanged: (String) -> Unit,
   onEmailChanged: (String) -> Unit,
   onPasswordChanged: (String) -> Unit,
   onSubmit: () -> Unit,
 ) {
+  item {
+    EditText(
+      modifier = Modifier.fillMaxWidth(),
+      value = formState.email,
+      enabled = !loading,
+      onValueChange = onNameChanged,
+      label = stringResource(R.string.form_label_name),
+      isError = formState.emailError != null,
+      errorMessage = formState.emailError,
+      keyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Text,
+        capitalization = KeyboardCapitalization.Words,
+        imeAction = ImeAction.Next
+      ),
+    )
+  }
   item {
     EditText(
       modifier = Modifier.fillMaxWidth(),
@@ -95,17 +115,18 @@ private fun LazyListScope.buildForm(
       enabled = !loading,
       onClick = onSubmit
     ) {
-      Text(stringResource(R.string.tx_sign_in))
+      Text(stringResource(R.string.tx_sign_up))
     }
   }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun SignInScreenPreview() {
+private fun SignUpScreenPreview() {
   DicodingStoriesTheme {
-    SignInScreen(
-      state = SignInState.initial(),
+    SignUpScreen(
+      state = SignUpState.initial(),
+      onNameChanged = {},
       onEmailChanged = {},
       onPasswordChanged = {},
       onSubmit = {},
@@ -116,12 +137,13 @@ private fun SignInScreenPreview() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun SignInScreenLoadingPreview() {
-  val state = SignInState.initial().copy(status = UiStatus.Loading)
+private fun SignUpScreenLoadingPreview() {
+  val state = SignUpState.initial().copy(status = UiStatus.Loading)
 
   DicodingStoriesTheme {
-    SignInScreen(
+    SignUpScreen(
       state = state,
+      onNameChanged = {},
       onEmailChanged = {},
       onPasswordChanged = {},
       onSubmit = {},
@@ -132,10 +154,10 @@ private fun SignInScreenLoadingPreview() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun SignInScreenFormErrorPreview() {
-  val state = SignInState.initial()
+private fun SignUpScreenFormErrorPreview() {
+  val state = SignUpState.initial()
     .copy(
-      formState = SignInFormState.initial()
+      formState = SignUpFormState.initial()
         .copy(
           emailError = UiText.StringResource(R.string.err_form_email_invalid),
           passwordError = UiText.StringResource(R.string.err_form_pass_invalid)
@@ -143,8 +165,9 @@ private fun SignInScreenFormErrorPreview() {
     )
 
   DicodingStoriesTheme {
-    SignInScreen(
+    SignUpScreen(
       state = state,
+      onNameChanged = {},
       onEmailChanged = {},
       onPasswordChanged = {},
       onSubmit = {},

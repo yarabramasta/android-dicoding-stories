@@ -13,6 +13,7 @@
     <string name="form_label_pass">Kata Sandi</string>
     <string name="err_form_pass_empty">Kata sandi tidak boleh kosong.</string>
     <string name="err_form_pass_invalid">Kata sandi harus memiliki se-tidaknya 8 karakter.</string>
+    <string name="form_label_name">Nama Lengkap</string>
     <string name="err_form_name_empty">Nama tidak boleh kosong.</string>
     <string name="err_form_name_invalid">Nama harus memiliki se-tidaknya 2 karakter.</string>
     <string name="err_general_trouble">Terjadi masalah…</string>

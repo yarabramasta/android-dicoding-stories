@@ -13,6 +13,7 @@
     <string name="form_label_pass">Password</string>
     <string name="err_form_pass_empty">Password must not be empty.</string>
     <string name="err_form_pass_invalid">Password must be at least 8 characters.</string>
+    <string name="form_label_name">Full Name</string>
     <string name="err_form_name_empty">Name must not be empty.</string>
     <string name="err_form_name_invalid">Name must be at least 2 characters.</string>
     <string name="err_general_trouble">Uh oh! Something went wrong…</string>
