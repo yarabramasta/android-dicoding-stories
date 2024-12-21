@@ -1,19 +1,28 @@
 <resources>
     <string name="app_name" translatable="false">Dicoding Stories</string>
+    <string name="tx_sign_in">Sign In</string>
+    <string name="tx_sign_up">Register</string>
     <string name="err_unauthorized">Uh oh! Seems like you\'re not logged in.</string>
-    <string name="err_bad_req_signin">An error occurred while logging in.</string>
-    <string name="err_bad_req_signup">An error occurred while creating account.</string>
-    <string name="err_invalid_creds">Invalid email or password.</string>
-    <string name="err_duplicated_creds">Email is already in use.</string>
+    <string name="err_bad_req_sign_in">An error occurred while logging in.</string>
+    <string name="err_bad_req_sign_up">An error occurred while creating account.</string>
+    <string name="err_invalid_credentials">Invalid email or password.</string>
+    <string name="err_duplicated_credentials">Email is already in use.</string>
+    <string name="form_label_email">Email Address</string>
     <string name="err_form_email_empty">Email must not be empty.</string>
     <string name="err_form_email_invalid">Invalid email address.</string>
+    <string name="form_label_pass">Password</string>
     <string name="err_form_pass_empty">Password must not be empty.</string>
     <string name="err_form_pass_invalid">Password must be at least 8 characters.</string>
     <string name="err_form_name_empty">Name must not be empty.</string>
     <string name="err_form_name_invalid">Name must be at least 2 characters.</string>
     <string name="err_general_trouble">Uh oh! Something went wrong…</string>
     <string name="err_signup_trouble">Failed to create account. Something went wrong.</string>
-    <string name="signup_success">Your account successfully created. Please sign in to continue.</string>
     <string name="onboarding_headline">Welcome to Dicoding Story!</string>
     <string name="onboarding_sub_headline">Want to share knowledge about Android, iOS, Machine Learning, Cloud, Front-end, Back-end, and other IT fields? Just do it on Dicoding Story!</string>
+    <string name="sign_in_headline">Ready to share stories?</string>
+    <string name="sign_in_sub_headline">Please fill your data first.</string>
+    <string name="sign_in_success">Welcome to Dicoding Story!</string>
+    <string name="sign_up_headline">Please fill out your data first</string>
+    <string name="sign_up_sub_headline">Register to Dicoding Story to continue.</string>
+    <string name="sign_up_success">Your account successfully created. Please sign in to continue.</string>
 </resources>

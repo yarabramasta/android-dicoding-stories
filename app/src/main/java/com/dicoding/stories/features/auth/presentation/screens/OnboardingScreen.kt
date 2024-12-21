@@ -126,6 +126,7 @@ fun OnboardingScreen(
         ) {
           Text(
             text = stringResource(R.string.onboarding_sub_headline),
+            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
           )
@@ -152,7 +153,10 @@ fun OnboardingScreen(
         ) {
           Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onNavigate(AppRoutes.SignIn) }
+            onClick = {
+              isVisible = false
+              onNavigate(AppRoutes.SignIn)
+            }
           ) {
             Text("Sign In")
           }
@@ -178,7 +182,10 @@ fun OnboardingScreen(
         ) {
           OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onNavigate(AppRoutes.SignUp) }
+            onClick = {
+              isVisible = false
+              onNavigate(AppRoutes.SignUp)
+            }
           ) {
             Text("Sign Up")
           }

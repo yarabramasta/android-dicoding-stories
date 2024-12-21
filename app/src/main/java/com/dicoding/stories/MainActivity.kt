@@ -106,7 +106,7 @@ private fun NavGraphBuilder.addSignIn(navController: NavHostController) {
       onEmailChanged = signInViewModel::onEmailChanged,
       onPasswordChanged = signInViewModel::onPasswordChanged,
       onSubmit = {
-        signInViewModel.onSubmit { session ->
+        signInViewModel.onSubmit(context) { session ->
           authViewModel.set(session)
         }
       },

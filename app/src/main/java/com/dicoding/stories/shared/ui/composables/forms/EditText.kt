@@ -20,6 +20,7 @@ fun EditText(
   modifier: Modifier = Modifier,
   label: String,
   value: String,
+  enabled: Boolean = true,
   errorMessage: UiText?,
   isError: Boolean,
   keyboardOptions: KeyboardOptions,
@@ -40,6 +41,7 @@ fun EditText(
         style = MaterialTheme.typography.bodyMedium
       )
     },
+    enabled = enabled,
     singleLine = true,
     keyboardOptions = keyboardOptions,
     keyboardActions = keyboardActions,
@@ -79,6 +81,7 @@ fun EditText(
     } else null,
     visualTransformation =
     if (isPasswordField && !passwordVisible) PasswordVisualTransformation()
-    else VisualTransformation.None
+    else VisualTransformation.None,
+    shape = MaterialTheme.shapes.medium
   )
 }

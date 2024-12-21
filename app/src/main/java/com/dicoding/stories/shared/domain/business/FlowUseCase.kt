@@ -23,5 +23,5 @@ abstract class FlowUseCase<in Params, Success>(
     }
     .flowOn(dispatcher)
 
-  abstract fun execute(params: Params): Flow<Result<Success>>
+  protected abstract fun execute(params: Params): Flow<Result<Success>>
 }

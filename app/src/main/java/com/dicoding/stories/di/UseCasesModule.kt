@@ -1,7 +1,7 @@
 package com.dicoding.stories.di
 
-import com.dicoding.stories.features.auth.data.local.SessionManager
 import com.dicoding.stories.features.auth.domain.business.GetSessionUseCase
+import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,12 +12,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCasesModule {
+
   @Provides
   @Singleton
   fun provideGetSessionUseCase(
     @IoDispatcher dispatcher: CoroutineDispatcher,
-    sessionManager: SessionManager,
-  ): GetSessionUseCase {
-    return GetSessionUseCase(dispatcher, sessionManager)
-  }
+    authRepository: AuthRepository,
+  ): GetSessionUseCase = GetSessionUseCase(dispatcher, authRepository)
 }
