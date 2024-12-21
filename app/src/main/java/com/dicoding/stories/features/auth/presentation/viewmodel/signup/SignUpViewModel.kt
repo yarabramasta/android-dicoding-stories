@@ -95,7 +95,7 @@ class SignUpViewModel @Inject constructor(
                 R.string.err_duplicated_credentials
               ).asString(context)
 
-              "BadRequestSignUpn" -> UiText.StringResource(
+              "BadRequestSignUp" -> UiText.StringResource(
                 R.string.err_bad_req_sign_up
               ).asString(context)
 
