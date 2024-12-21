@@ -67,7 +67,7 @@ class SignUpViewModel @Inject constructor(
         reduce { state.copy(status = UiStatus.Loading) }
 
         val params = SignUpUseCase.Params(
-          name = "",
+          name = state.formState.name,
           email = state.formState.email,
           password = state.formState.password
         )
