@@ -31,6 +31,7 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInSi
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInViewModel
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
+import com.dicoding.stories.features.stories.presentation.screens.MainScreen
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
 import com.dicoding.stories.shared.ui.navigation.AppRoutes
@@ -115,7 +116,9 @@ private fun NavGraphBuilder.addSignIn(navController: NavHostController) {
         }
       },
       onBack = {
-        navController.popBackStack()
+        navController.navigate(AppRoutes.Onboarding) {
+          popUpTo(AppRoutes.Onboarding) { inclusive = true }
+        }
       }
     )
   }
@@ -151,7 +154,9 @@ private fun NavGraphBuilder.addSignUp(navController: NavHostController) {
         signUpViewModel.onSubmit(context)
       },
       onBack = {
-        navController.popBackStack()
+        navController.navigate(AppRoutes.Onboarding) {
+          popUpTo(AppRoutes.Onboarding) { inclusive = true }
+        }
       }
     )
   }
@@ -159,18 +164,6 @@ private fun NavGraphBuilder.addSignUp(navController: NavHostController) {
 
 private fun NavGraphBuilder.addMain() {
   composable<AppRoutes.Main> {
-    Scaffold(
-      modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
-      Column(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(innerPadding),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-      ) {
-        Text("Main Screen")
-      }
-    }
+    MainScreen()
   }
 }

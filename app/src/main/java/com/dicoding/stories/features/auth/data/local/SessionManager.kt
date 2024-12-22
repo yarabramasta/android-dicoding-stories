@@ -2,38 +2,33 @@ package com.dicoding.stories.features.auth.data.local
 
 import androidx.datastore.core.DataStore
 import com.dicoding.stories.features.auth.domain.models.Session
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SessionManager @Inject constructor(
   private val dataStore: DataStore<Session>,
 ) {
-  private val _cacheState = MutableStateFlow<Session?>(null)
-  val state = _cacheState.asStateFlow()
-
-  suspend fun load() {
+  fun load(): Flow<Session?> = flow {
     try {
       dataStore.data.collect {
         if (it.id.isEmpty() or it.name.isEmpty() or it.token.isEmpty()) {
-          _cacheState.value = null
+          emit(null)
         } else {
-          _cacheState.value = it
+          emit(it)
         }
       }
     } catch (e: Exception) {
       e.printStackTrace()
-      _cacheState.value = null
+      emit(null)
     }
   }
 
   suspend fun save(session: Session) {
     dataStore.updateData { session }
-    _cacheState.value = session
   }
 
   suspend fun clear() {
     dataStore.updateData { Session.default() }
-    _cacheState.value = null
   }
 }

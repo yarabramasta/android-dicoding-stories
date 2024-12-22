@@ -60,12 +60,12 @@ private fun LazyListScope.buildForm(
   item {
     EditText(
       modifier = Modifier.fillMaxWidth(),
-      value = formState.email,
+      value = formState.name,
       enabled = !loading,
       onValueChange = onNameChanged,
       label = stringResource(R.string.form_label_name),
-      isError = formState.emailError != null,
-      errorMessage = formState.emailError,
+      isError = formState.nameError != null,
+      errorMessage = formState.nameError,
       keyboardOptions = KeyboardOptions(
         keyboardType = KeyboardType.Text,
         capitalization = KeyboardCapitalization.Words,

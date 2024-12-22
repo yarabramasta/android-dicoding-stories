@@ -1,20 +1,28 @@
 package com.dicoding.stories.features.auth.data.remote
 
 import com.skydoves.sandwich.ApiResponse
-import retrofit2.http.Field
+import kotlinx.serialization.Serializable
+import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthService {
+
   @POST("register")
-  suspend fun register(
-    @Field("name") name: String,
-    @Field("email") email: String,
-    @Field("password") password: String,
-  ): ApiResponse<RegisterResponse>
+  suspend fun register(@Body body: RegisterBody): ApiResponse<RegisterResponse>
 
   @POST("login")
-  suspend fun login(
-    @Field("email") email: String,
-    @Field("password") password: String,
-  ): ApiResponse<LoginResponse>
+  suspend fun login(@Body body: LoginBody): ApiResponse<LoginResponse>
 }
+
+@Serializable
+data class RegisterBody(
+  val name: String,
+  val email: String,
+  val password: String,
+)
+
+@Serializable
+data class LoginBody(
+  val email: String,
+  val password: String,
+)

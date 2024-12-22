@@ -9,6 +9,7 @@ import com.dicoding.stories.features.auth.domain.models.Session
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 import javax.inject.Inject
@@ -62,52 +63,46 @@ class SignInViewModel @Inject constructor(
           password = state.formState.password
         )
 
-        signInUseCase.invoke(params).fold(
-          onSuccess = { session ->
-            onSuccess?.invoke(session)
-
-            reduce {
-              state.copy(
-                status = UiStatus.Success,
-                formState = SignInFormState.initial()
-              )
-            }
-
-            postSideEffect(SignInSideEffect.OnSubmitSuccessNavigate)
-            postSideEffect(
-              SignInSideEffect.ShowToast(
-                UiText.StringResource(R.string.sign_in_success)
-                  .asString(context)
-              )
-            )
-          },
-          onFailure = {
-            val message: String = when (it.message) {
-              "InvalidCredential" -> UiText.StringResource(
-                R.string.err_invalid_credentials
-              ).asString(context)
-
-              "BadRequestSignIn" -> UiText.StringResource(
-                R.string.err_bad_req_sign_in
-              ).asString(context)
-
-              else -> UiText.StringResource(R.string.err_general_trouble)
-                .asString(context)
-            }
-
-            reduce {
-              state.copy(
-                status = UiStatus.Failure(message),
-                formState = state.formState.copy(
-                  emailError = state.formState.validateEmail(state.formState.email),
-                  passwordError = state.formState.validatePassword(state.formState.password)
+        container.scope.launch {
+          signInUseCase(params)
+            .fold(
+              onSuccess = { session ->
+                reduce {
+                  state.copy(
+                    status = UiStatus.Success,
+                    formState = SignInFormState.initial()
+                  )
+                }
+                postSideEffect(SignInSideEffect.OnSubmitSuccessNavigate)
+                postSideEffect(
+                  SignInSideEffect.ShowToast(
+                    UiText
+                      .StringResource(R.string.sign_in_success)
+                      .asString(context)
+                  )
                 )
-              )
-            }
 
-            postSideEffect(SignInSideEffect.ShowToast(message))
-          }
-        )
+                onSuccess?.invoke(session)
+              },
+              onFailure = {
+                val message: String = when (it.message) {
+                  "InvalidCredential" -> UiText.StringResource(
+                    R.string.err_invalid_credentials
+                  ).asString(context)
+
+                  "BadRequestSignIn" -> UiText.StringResource(
+                    R.string.err_bad_req_sign_in
+                  ).asString(context)
+
+                  else -> UiText.StringResource(R.string.err_general_trouble)
+                    .asString(context)
+                }
+
+                reduce { state.copy(status = UiStatus.Failure(message)) }
+                postSideEffect(SignInSideEffect.ShowToast(message))
+              }
+            )
+        }
       }
     }
   }

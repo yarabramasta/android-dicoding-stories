@@ -25,7 +25,7 @@ class AuthViewModel @Inject constructor(
 
       coroutineScope {
         launch {
-          getSessionUseCase.invoke(Unit).collect {
+          getSessionUseCase(Unit).collect {
             reduce {
               state.copy(
                 status = UiStatus.Success,

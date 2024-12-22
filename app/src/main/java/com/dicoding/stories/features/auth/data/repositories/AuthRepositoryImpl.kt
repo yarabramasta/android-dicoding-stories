@@ -2,14 +2,16 @@ package com.dicoding.stories.features.auth.data.repositories
 
 import com.dicoding.stories.features.auth.data.local.SessionManager
 import com.dicoding.stories.features.auth.data.remote.AuthService
+import com.dicoding.stories.features.auth.data.remote.LoginBody
+import com.dicoding.stories.features.auth.data.remote.RegisterBody
 import com.dicoding.stories.features.auth.domain.exceptions.AuthException
 import com.dicoding.stories.features.auth.domain.models.Session
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
-import com.skydoves.sandwich.suspendOnError
+import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.onSuccess
 import com.skydoves.sandwich.suspendOnSuccess
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -19,26 +21,14 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
   override fun getSession(): Flow<Result<Session?>> {
-    return flow {
-      delay(1000L)
-      sessionManager.load()
-      sessionManager.state.collect {
-        emit(Result.success(it))
-      }
-    }
+    return sessionManager.load().map { Result.success(it) }
   }
 
   override suspend fun login(email: String, password: String): Result<Session> {
-    var result: Result<Session> =
-      Result.failure(AuthException.BadRequestSignIn())
+    var result: Result<Session> = Result.failure(Throwable())
 
-    authService.login(email, password)
+    authService.login(LoginBody(email, password))
       .suspendOnSuccess {
-        if (data.error) {
-          result = Result.failure(AuthException.InvalidCredentials())
-          return@suspendOnSuccess
-        }
-
         val session = Session(
           id = data.loginResult.userId,
           name = data.loginResult.name,
@@ -47,10 +37,11 @@ class AuthRepositoryImpl @Inject constructor(
         sessionManager.save(session)
         result = Result.success(session)
       }
-      .suspendOnError {
+      .onError {
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         result = when (statusCode) {
-          400 -> Result.failure(AuthException.InvalidCredentials())
+          400 -> Result.failure(AuthException.BadRequestSignIn())
+          401 -> Result.failure(AuthException.InvalidCredentials())
           else -> result
         }
       }
@@ -63,19 +54,11 @@ class AuthRepositoryImpl @Inject constructor(
     email: String,
     password: String,
   ): Result<Boolean> {
-    var result: Result<Boolean> =
-      Result.failure(AuthException.BadRequestSignUp())
+    var result: Result<Boolean> = Result.failure(Throwable())
 
-    authService.register(name, email, password)
-      .suspendOnSuccess {
-        if (data.error) {
-          result = Result.failure(AuthException.DuplicatedCredentials())
-          return@suspendOnSuccess
-        }
-
-        result = Result.success(true)
-      }
-      .suspendOnError {
+    authService.register(RegisterBody(name, email, password))
+      .onSuccess { result = Result.success(true) }
+      .onError {
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         result = when (statusCode) {
           400 -> Result.failure(AuthException.DuplicatedCredentials())
