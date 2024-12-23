@@ -15,5 +15,11 @@ sealed class AppRoutes {
   data object SignUp : AppRoutes()
 
   @Serializable
-  data object Main : AppRoutes()
+  data object Home : AppRoutes()
+
+  @Serializable
+  data class DetailStory(val id: String) : AppRoutes()
+
+  @Serializable
+  data object CreateStory : AppRoutes()
 }

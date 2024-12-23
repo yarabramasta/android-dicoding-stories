@@ -25,7 +25,7 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOut
 import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOutViewModel
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
-import com.dicoding.stories.features.stories.presentation.screens.MainScreen
+import com.dicoding.stories.features.home.presentation.screens.HomeScreen
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
 import com.dicoding.stories.shared.ui.navigation.AppRoutes
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     setContent {
       val authState by authViewModel.collectAsState()
       val startDestination =
-        if (authState.session != null) AppRoutes.Main
+        if (authState.session != null) AppRoutes.Home
         else AppRoutes.Onboarding
 
       val navController = rememberNavController()
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
           addOnboarding(navController = navController)
           addSignIn(navController = navController)
           addSignUp(navController = navController)
-          addMain(navController = navController)
+          addHome(navController = navController)
         }
       }
     }
@@ -89,8 +89,8 @@ private fun NavGraphBuilder.addSignIn(navController: NavHostController) {
     signInViewModel.collectSideEffect { effect ->
       when (effect) {
         SignInSideEffect.OnSubmitSuccessNavigate -> {
-          navController.navigate(AppRoutes.Main) {
-            popUpTo(AppRoutes.Main) { inclusive = true }
+          navController.navigate(AppRoutes.Home) {
+            popUpTo(AppRoutes.Home) { inclusive = true }
           }
         }
 
@@ -156,8 +156,8 @@ private fun NavGraphBuilder.addSignUp(navController: NavHostController) {
   }
 }
 
-private fun NavGraphBuilder.addMain(navController: NavHostController) {
-  composable<AppRoutes.Main> {
+private fun NavGraphBuilder.addHome(navController: NavHostController) {
+  composable<AppRoutes.Home> {
     val context = LocalContext.current
 
     val authViewModel = it.scopedViewModel<AuthViewModel>(navController)
@@ -179,7 +179,7 @@ private fun NavGraphBuilder.addMain(navController: NavHostController) {
       }
     }
 
-    MainScreen(
+    HomeScreen(
       signOutState = signOutState,
       onSignOut = {
         signOutViewModel.signOut(context) {

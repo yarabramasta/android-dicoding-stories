@@ -28,4 +28,5 @@
     <string name="sign_up_success">Your account successfully created. Please sign in to continue.</string>
     <string name="home_headline">Welcome to Dicoding Stories</string>
     <string name="home_sub_headline">See the latest stories from Dicoding, or create your own stories using the (+) button below.</string>
+    <string name="story_uploaded_by">Story uploaded by %1$s</string>
 </resources>
