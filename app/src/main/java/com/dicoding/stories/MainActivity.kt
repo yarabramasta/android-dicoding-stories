@@ -26,13 +26,19 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOut
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.features.home.presentation.screens.HomeScreen
+import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
+import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
+import com.dicoding.stories.features.stories.domain.models.Story
+import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
 import com.dicoding.stories.shared.ui.navigation.AppRoutes
+import com.dicoding.stories.shared.ui.navigation.navType
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import kotlin.reflect.typeOf
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -63,6 +69,7 @@ class MainActivity : AppCompatActivity() {
           addSignIn(navController = navController)
           addSignUp(navController = navController)
           addHome(navController = navController)
+          addStoryDetail(navController = navController)
         }
       }
     }
@@ -165,6 +172,9 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
     val signOutViewModel = hiltViewModel<SignOutViewModel>()
     val signOutState by signOutViewModel.collectAsState()
 
+    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+    val homeState by homeViewModel.collectAsState()
+
     signOutViewModel.collectSideEffect { effect ->
       when (effect) {
         SignOutSideEffect.OnSignOutNavigate -> {
@@ -179,12 +189,39 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
       }
     }
 
+    homeViewModel.collectSideEffect { effect ->
+      when (effect) {
+        is HomeSideEffect.OnStoryClickNavigate -> {
+          navController.navigate(AppRoutes.DetailStory(effect.story))
+        }
+      }
+    }
+
     HomeScreen(
+      state = homeState,
+      onRefresh = homeViewModel::refresh,
+      onStoryClick = homeViewModel::onStoryClick,
       signOutState = signOutState,
       onSignOut = {
         signOutViewModel.signOut(context) {
           authViewModel.set(null)
         }
+      }
+    )
+  }
+}
+
+private fun NavGraphBuilder.addStoryDetail(navController: NavHostController) {
+  composable<AppRoutes.DetailStory>(
+    typeMap = mapOf(
+      typeOf<Story>() to navType<Story>(),
+      typeOf<Story?>() to navType<Story?>()
+    )
+  ) {
+    StoryDetailScreen(
+      onBack = {
+        navController.previousBackStackEntry?.savedStateHandle?.set("story", it)
+        navController.popBackStack()
       }
     )
   }

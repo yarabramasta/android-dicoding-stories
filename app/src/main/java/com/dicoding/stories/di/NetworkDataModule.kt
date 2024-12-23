@@ -3,6 +3,7 @@ package com.dicoding.stories.di
 import com.dicoding.stories.BuildConfig
 import com.dicoding.stories.features.auth.data.local.SessionManager
 import com.dicoding.stories.features.auth.data.remote.AuthService
+import com.dicoding.stories.features.stories.data.remote.StoriesService
 import com.dicoding.stories.shared.lib.http.interceptors.AuthTokenInterceptor
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
@@ -48,9 +49,12 @@ object NetworkDataModule {
   fun provideRetrofit(
     okHttpClient: OkHttpClient,
   ): Retrofit {
+    val json = Json { ignoreUnknownKeys = true }
     return Retrofit.Builder()
       .baseUrl(BuildConfig.DICODING_EVENTS_API_BASE_URL)
-      .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+      .addConverterFactory(
+        json.asConverterFactory("application/json".toMediaType())
+      )
       .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
       .client(okHttpClient)
       .build()
@@ -61,4 +65,10 @@ object NetworkDataModule {
   fun provideAuthService(
     retrofit: Retrofit,
   ): AuthService = retrofit.create(AuthService::class.java)
+
+  @Provides
+  @Singleton
+  fun provideStoriesService(
+    retrofit: Retrofit,
+  ): StoriesService = retrofit.create(StoriesService::class.java)
 }

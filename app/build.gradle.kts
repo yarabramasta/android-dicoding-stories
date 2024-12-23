@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.hilt.android)
   alias(libs.plugins.ksp)
+  id("kotlin-parcelize")
 }
 
 val keystoreFile = rootProject.file("app/secrets.properties")

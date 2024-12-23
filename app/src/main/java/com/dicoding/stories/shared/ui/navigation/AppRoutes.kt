@@ -1,8 +1,8 @@
 package com.dicoding.stories.shared.ui.navigation
 
+import com.dicoding.stories.features.stories.domain.models.Story
 import kotlinx.serialization.Serializable
 
-@Serializable
 sealed class AppRoutes {
 
   @Serializable
@@ -18,7 +18,7 @@ sealed class AppRoutes {
   data object Home : AppRoutes()
 
   @Serializable
-  data class DetailStory(val id: String) : AppRoutes()
+  data class DetailStory(val story: Story) : AppRoutes()
 
   @Serializable
   data object CreateStory : AppRoutes()

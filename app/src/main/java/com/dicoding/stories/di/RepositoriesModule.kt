@@ -2,6 +2,8 @@ package com.dicoding.stories.di
 
 import com.dicoding.stories.features.auth.data.repositories.AuthRepositoryImpl
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
+import com.dicoding.stories.features.stories.data.repositories.StoriesRepositoryImpl
+import com.dicoding.stories.features.stories.domain.repositories.StoriesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,4 +19,10 @@ abstract class RepositoriesModule {
   abstract fun bindAuthRepository(
     authRepositoryImpl: AuthRepositoryImpl,
   ): AuthRepository
+
+  @Binds
+  @Singleton
+  abstract fun bindStoriesRepository(
+    storiesRepositoryImpl: StoriesRepositoryImpl,
+  ): StoriesRepository
 }

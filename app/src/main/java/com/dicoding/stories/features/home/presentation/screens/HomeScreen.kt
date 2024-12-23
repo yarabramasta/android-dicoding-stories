@@ -195,7 +195,11 @@ private fun LazyListScope.buildStories(
           textAlign = TextAlign.Center
         )
         Text(
-          text = "Exception: ${status.message}",
+          text =
+          when (status.message) {
+            "UnknownException" -> "Exception: " + stringResource(R.string.err_general_trouble)
+            else -> "Exception: ${status.message}"
+          },
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.outline,
           textAlign = TextAlign.Center
@@ -274,7 +278,7 @@ private fun HomeScreenFailurePreview() {
   DicodingStoriesTheme {
     HomeScreen(
       state = HomeState.initial()
-        .copy(status = UiStatus.Failure("Cannot retrieve stories from server due to network error...")),
+        .copy(status = UiStatus.Failure("UnknownException")),
     )
   }
 }

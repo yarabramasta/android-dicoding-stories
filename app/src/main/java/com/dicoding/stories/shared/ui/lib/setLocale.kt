@@ -8,9 +8,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 
 fun setLocale(context: Context, localeTag: String) {
-//  context.findActivity()?.runOnUiThread {
-//    Locale.setDefault(Locale.forLanguageTag(localeTag))
-
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     context
       .getSystemService(LocaleManager::class.java)
@@ -22,9 +19,4 @@ fun setLocale(context: Context, localeTag: String) {
   }
 
   context.findActivity()?.recreate()
-
-//    context.startActivity(
-//      Intent.makeRestartActivityTask((context as Activity).intent?.component)
-//    )
-//  }
 }

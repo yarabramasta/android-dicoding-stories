@@ -30,7 +30,10 @@ fun StoryListItem(
     leadingContent = {
       SubcomposeAsyncImage(
         model = story.photoUrl,
-        contentDescription = stringResource(R.string.story_uploaded_by, story.name),
+        contentDescription = stringResource(
+          R.string.story_uploaded_by,
+          story.name
+        ),
         loading = { ShimmerBox(modifier = Modifier.size(64.dp)) },
         error = {
           ShimmerBox(

@@ -19,10 +19,11 @@ class AuthTokenInterceptor @Inject constructor(
       sessionManager.load().first()?.token
     }
 
-    val request = chain.request()
+    val builder = chain.request().newBuilder()
+    var request = builder.build()
+
     if (token != null) {
-      request
-        .newBuilder()
+      request = builder
         .addHeader("Authorization", "Bearer $token")
         .build()
     }
