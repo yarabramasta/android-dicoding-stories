@@ -26,4 +26,6 @@
     <string name="sign_up_headline">Lengkapi data dirimu dulu ya</string>
     <string name="sign_up_sub_headline">Daftar ke Dicoding Story sebelum melanjutkan.</string>
     <string name="sign_up_success">Akun Anda berhasil dibuat. Masuk untuk melanjutkan.</string>
+    <string name="home_headline">Selamat datang di Dicoding Stories</string>
+    <string name="home_sub_headline">Lihat stories terbari dari Dicoding, atau buat stories kamu sendiri menggunakan (+) button di bawah.</string>
 </resources>

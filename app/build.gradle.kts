@@ -40,7 +40,7 @@ android {
 
     loadConfig("String", "DICODING_EVENTS_API_BASE_URL", "")
 
-    resourceConfigurations.plus(listOf("en", "id"))
+    resourceConfigurations.plus(listOf("en", "in"))
   }
 
   buildTypes {

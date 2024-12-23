@@ -1,6 +1,5 @@
 package com.dicoding.stories.shared.ui.lib
 
-import android.app.Activity
 import android.app.LocaleManager
 import android.content.Context
 import android.os.Build
@@ -22,7 +21,7 @@ fun setLocale(context: Context, localeTag: String) {
     )
   }
 
-  (context as Activity).recreate()
+  context.findActivity()?.recreate()
 
 //    context.startActivity(
 //      Intent.makeRestartActivityTask((context as Activity).intent?.component)

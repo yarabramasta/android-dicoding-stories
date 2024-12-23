@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.stories.R
@@ -28,7 +28,7 @@ fun MainScreen(
   onSignOut: () -> Unit,
 ) {
   val context = LocalContext.current
-  val locale = Locale.current.toLanguageTag()
+  val locale = LocalContext.current.resources.configuration.locales[0].language
 
   Scaffold(
     modifier = Modifier.fillMaxSize(),
@@ -59,7 +59,7 @@ fun MainScreen(
               setLocale(
                 context,
                 when (locale) {
-                  "en" -> "id"
+                  "en" -> "in"
                   else -> "en"
                 }
               )
@@ -67,7 +67,7 @@ fun MainScreen(
           ) {
             Text(
               text = when (locale) {
-                "id" -> "🇮🇩 ID"
+                "in" -> "🇮🇩 ID"
                 else -> "🇺🇸 EN"
               },
             )
@@ -92,13 +92,13 @@ fun MainScreen(
     ) {
       item {
         Text(
-          text = "Welcome to Dicoding Stories",
+          text = stringResource(R.string.home_headline),
           style = MaterialTheme.typography.titleLarge,
           fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-          text = "See the latest stories from Dicoding, or create your own stories using the (+) button below.",
+          text = stringResource(R.string.home_sub_headline),
         )
       }
     }
