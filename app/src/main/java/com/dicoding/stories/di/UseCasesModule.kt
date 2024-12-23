@@ -2,6 +2,7 @@ package com.dicoding.stories.di
 
 import com.dicoding.stories.features.auth.domain.business.GetSessionUseCase
 import com.dicoding.stories.features.auth.domain.business.SignInUseCase
+import com.dicoding.stories.features.auth.domain.business.SignOutUseCase
 import com.dicoding.stories.features.auth.domain.business.SignUpUseCase
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
 import dagger.Module
@@ -35,4 +36,11 @@ object UseCasesModule {
     @IoDispatcher dispatcher: CoroutineDispatcher,
     authRepository: AuthRepository,
   ): SignUpUseCase = SignUpUseCase(dispatcher, authRepository)
+
+  @Provides
+  @Singleton
+  fun provideSignOutUseCase(
+    @IoDispatcher dispatcher: CoroutineDispatcher,
+    authRepository: AuthRepository,
+  ): SignOutUseCase = SignOutUseCase(dispatcher, authRepository)
 }

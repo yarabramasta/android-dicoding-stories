@@ -18,7 +18,7 @@ import com.dicoding.stories.R
 import com.dicoding.stories.features.auth.presentation.atoms.AuthFormLayout
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInFormState
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInState
-import com.dicoding.stories.shared.ui.composables.forms.EditText
+import com.dicoding.stories.shared.ui.composables.EditText
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme

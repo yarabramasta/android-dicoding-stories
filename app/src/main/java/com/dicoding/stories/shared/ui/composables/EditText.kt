@@ -1,4 +1,4 @@
-package com.dicoding.stories.shared.ui.composables.forms
+package com.dicoding.stories.shared.ui.composables
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions

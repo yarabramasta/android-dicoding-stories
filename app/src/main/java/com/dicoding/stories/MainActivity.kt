@@ -7,15 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -29,6 +21,8 @@ import com.dicoding.stories.features.auth.presentation.screens.SignUpScreen
 import com.dicoding.stories.features.auth.presentation.viewmodel.auth.AuthViewModel
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signin.SignInViewModel
+import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOutSideEffect
+import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOutViewModel
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.features.stories.presentation.screens.MainScreen
@@ -68,7 +62,7 @@ class MainActivity : AppCompatActivity() {
           addOnboarding(navController = navController)
           addSignIn(navController = navController)
           addSignUp(navController = navController)
-          addMain()
+          addMain(navController = navController)
         }
       }
     }
@@ -162,8 +156,36 @@ private fun NavGraphBuilder.addSignUp(navController: NavHostController) {
   }
 }
 
-private fun NavGraphBuilder.addMain() {
+private fun NavGraphBuilder.addMain(navController: NavHostController) {
   composable<AppRoutes.Main> {
-    MainScreen()
+    val context = LocalContext.current
+
+    val authViewModel = it.scopedViewModel<AuthViewModel>(navController)
+
+    val signOutViewModel = hiltViewModel<SignOutViewModel>()
+    val signOutState by signOutViewModel.collectAsState()
+
+    signOutViewModel.collectSideEffect { effect ->
+      when (effect) {
+        SignOutSideEffect.OnSignOutNavigate -> {
+          navController.navigate(AppRoutes.Onboarding) {
+            popUpTo(AppRoutes.Onboarding) { inclusive = true }
+          }
+        }
+
+        is SignOutSideEffect.ShowMessage -> {
+          context.showToast(effect.message)
+        }
+      }
+    }
+
+    MainScreen(
+      signOutState = signOutState,
+      onSignOut = {
+        signOutViewModel.signOut(context) {
+          authViewModel.set(null)
+        }
+      }
+    )
   }
 }

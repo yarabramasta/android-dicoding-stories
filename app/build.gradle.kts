@@ -31,6 +31,7 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+
     fun loadConfig(type: String, key: String, defaultValue: String) {
       val value = properties.getProperty(key) ?: defaultValue
       manifestPlaceholders[key] = value
@@ -38,6 +39,8 @@ android {
     }
 
     loadConfig("String", "DICODING_EVENTS_API_BASE_URL", "")
+
+    resourceConfigurations.plus(listOf("en", "id"))
   }
 
   buildTypes {

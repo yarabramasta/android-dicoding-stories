@@ -68,4 +68,13 @@ class AuthRepositoryImpl @Inject constructor(
 
     return result
   }
+
+  override suspend fun logout(): Result<Boolean> {
+    try {
+      sessionManager.clear()
+      return Result.success(true)
+    } catch (e: Exception) {
+      return Result.failure(e)
+    }
+  }
 }
