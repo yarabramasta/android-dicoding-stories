@@ -4,6 +4,7 @@ import com.dicoding.stories.features.stories.data.remote.StoriesService
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.domain.repositories.StoriesRepository
 import com.skydoves.sandwich.suspendOnError
+import com.skydoves.sandwich.suspendOnFailure
 import com.skydoves.sandwich.suspendOnSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,6 +22,7 @@ class StoriesRepositoryImpl @Inject constructor(
     storiesService
       .getStories(page = page, size = size, location = location)
       .suspendOnSuccess { emit(Result.success(data.listStory)) }
+      .suspendOnFailure { emit(Result.failure(Throwable("UnknownError"))) }
       .suspendOnError {
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         when (statusCode) {

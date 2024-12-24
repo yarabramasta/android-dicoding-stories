@@ -8,6 +8,7 @@ import com.dicoding.stories.features.auth.domain.exceptions.AuthException
 import com.dicoding.stories.features.auth.domain.models.Session
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
 import com.skydoves.sandwich.onError
+import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
 import com.skydoves.sandwich.suspendOnSuccess
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
         sessionManager.save(session)
         result = Result.success(session)
       }
+      .onFailure { result = Result.failure(Throwable("UnknownError")) }
       .onError {
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         result = when (statusCode) {

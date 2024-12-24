@@ -220,7 +220,6 @@ private fun NavGraphBuilder.addStoryDetail(navController: NavHostController) {
   ) {
     StoryDetailScreen(
       onBack = {
-        navController.previousBackStackEntry?.savedStateHandle?.set("story", it)
         navController.popBackStack()
       }
     )

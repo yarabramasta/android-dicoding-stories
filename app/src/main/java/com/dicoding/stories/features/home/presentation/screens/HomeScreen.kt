@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Interests
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,100 +44,105 @@ fun HomeScreen(
   val context = LocalContext.current
   val locale = LocalContext.current.resources.configuration.locales[0].language
 
-  Scaffold(
-    modifier = Modifier.fillMaxSize(),
-    topBar = {
-      TopAppBar(
-        title = {
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.width(IntrinsicSize.Max)
-          ) {
-            Image(
-              painter = painterResource(R.drawable.img_onboarding_illustration),
-              contentDescription = "Dicoding Stories",
-              modifier = Modifier.size(32.dp)
-            )
-            Text(
-              text = "Dicoding Story",
-              style = MaterialTheme.typography.titleMedium,
-              fontWeight = FontWeight.SemiBold
-            )
-          }
-        },
-        actions = {
-          TextButton(
-            enabled = signOutState.status == UiStatus.Idle,
-            onClick = {
-              setLocale(
-                context,
-                when (locale) {
-                  "en" -> "in"
-                  else -> "en"
-                }
+  PullToRefreshBox(
+    isRefreshing = state.isRefreshing,
+    onRefresh = onRefresh,
+  ) {
+    Scaffold(
+      modifier = Modifier.fillMaxSize(),
+      topBar = {
+        TopAppBar(
+          title = {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              modifier = Modifier.width(IntrinsicSize.Max)
+            ) {
+              Image(
+                painter = painterResource(R.drawable.img_onboarding_illustration),
+                contentDescription = "Dicoding Stories",
+                modifier = Modifier.size(32.dp)
+              )
+              Text(
+                text = "Dicoding Story",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
               )
             }
-          ) {
-            Text(
-              text = when (locale) {
-                "in" -> "🇮🇩 ID"
-                else -> "🇺🇸 EN"
-              },
-            )
+          },
+          actions = {
+            TextButton(
+              enabled = signOutState.status == UiStatus.Idle,
+              onClick = {
+                setLocale(
+                  context,
+                  when (locale) {
+                    "en" -> "in"
+                    else -> "en"
+                  }
+                )
+              }
+            ) {
+              Text(
+                text = when (locale) {
+                  "in" -> "🇮🇩 ID"
+                  else -> "🇺🇸 EN"
+                },
+              )
+            }
+            IconButton(
+              enabled = signOutState.status == UiStatus.Idle,
+              onClick = onSignOut
+            ) {
+              Icon(
+                imageVector = Icons.AutoMirrored.Outlined.Logout,
+                contentDescription = "Sign out"
+              )
+            }
           }
-          IconButton(
-            enabled = signOutState.status == UiStatus.Idle,
-            onClick = onSignOut
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.Logout,
-              contentDescription = "Sign out"
-            )
-          }
+        )
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+          onClick = onNavigateCreateStory,
+        ) {
+          Icon(
+            imageVector = Icons.Outlined.Edit,
+            contentDescription = "Create story"
+          )
         }
-      )
-    },
-    floatingActionButton = {
-      FloatingActionButton(
-        onClick = onNavigateCreateStory,
+      }
+    ) { innerPadding ->
+      LazyColumn(
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(innerPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(vertical = 24.dp)
       ) {
-        Icon(
-          imageVector = Icons.Outlined.Edit,
-          contentDescription = "Create story"
-        )
-      }
-    }
-  ) { innerPadding ->
-    LazyColumn(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(innerPadding),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      contentPadding = PaddingValues(vertical = 24.dp)
-    ) {
-      item {
-        Text(
-          text = stringResource(R.string.home_headline),
-          style = MaterialTheme.typography.titleLarge,
-          fontWeight = FontWeight.SemiBold,
-          modifier = Modifier.padding(horizontal = 24.dp),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-          text = stringResource(R.string.home_sub_headline),
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(horizontal = 24.dp),
-        )
-      }
-      if (state.stories.isEmpty()) {
-        buildEmptyStories()
-      } else {
-        buildStories(
-          status = state.status,
-          stories = state.stories,
-          onStoryClick = onStoryClick
-        )
+        item {
+          Text(
+            text = stringResource(R.string.home_headline),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 24.dp),
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = stringResource(R.string.home_sub_headline),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 24.dp),
+          )
+        }
+        if (state.stories.isEmpty()) {
+          buildEmptyStories()
+        } else {
+          buildStories(
+            status = state.status,
+            stories = state.stories,
+            onStoryClick = onStoryClick
+          )
+        }
       }
     }
   }

@@ -7,6 +7,7 @@ import com.dicoding.stories.shared.ui.lib.UiStatus
 @Immutable
 data class HomeState(
   val status: UiStatus,
+  val isRefreshing: Boolean = false,
   val stories: List<Story>,
 ) {
   companion object {

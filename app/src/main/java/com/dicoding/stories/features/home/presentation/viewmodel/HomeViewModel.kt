@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
 
   fun refresh() {
     intent {
-      reduce { state.copy(status = UiStatus.Loading) }
+      reduce { state.copy(status = UiStatus.Loading, isRefreshing = true) }
       fetch(GetStoriesUseCase.Params())
     }
   }
@@ -46,6 +46,7 @@ class HomeViewModel @Inject constructor(
               reduce {
                 state.copy(
                   status = UiStatus.Success,
+                  isRefreshing = false,
                   stories = stories
                 )
               }
@@ -54,6 +55,7 @@ class HomeViewModel @Inject constructor(
               reduce {
                 state.copy(
                   status = UiStatus.Failure(e.message ?: "UnknownException"),
+                  isRefreshing = false,
                 )
               }
             }

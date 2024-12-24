@@ -18,7 +18,7 @@ sealed class AppRoutes {
   data object Home : AppRoutes()
 
   @Serializable
-  data class DetailStory(val story: Story) : AppRoutes()
+  data class DetailStory(val story: Story? = null) : AppRoutes()
 
   @Serializable
   data object CreateStory : AppRoutes()
