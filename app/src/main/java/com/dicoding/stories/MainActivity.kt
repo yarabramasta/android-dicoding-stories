@@ -29,7 +29,9 @@ import com.dicoding.stories.features.home.presentation.screens.HomeScreen
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
+import com.dicoding.stories.features.stories.presentation.screens.CreateStoryScreen
 import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
+import com.dicoding.stories.features.stories.presentation.viewmodel.create.CreateStoryViewModel
 import com.dicoding.stories.features.stories.presentation.viewmodel.details.StoryDetailsViewModel
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
@@ -71,6 +73,7 @@ class MainActivity : AppCompatActivity() {
           addSignUp(navController = navController)
           addHome(navController = navController)
           addStoryDetail(navController = navController)
+          addCreateStory(navController = navController)
         }
       }
     }
@@ -207,6 +210,9 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
         signOutViewModel.signOut(context) {
           authViewModel.set(null)
         }
+      },
+      onNavigateCreateStory = {
+        navController.navigate(AppRoutes.CreateStory)
       }
     )
   }
@@ -228,6 +234,30 @@ private fun NavGraphBuilder.addStoryDetail(navController: NavHostController) {
       onBack = {
         navController.popBackStack()
       }
+    )
+  }
+}
+
+private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
+  composable<AppRoutes.CreateStory> {
+    val viewModel = hiltViewModel<CreateStoryViewModel>()
+    val state by viewModel.collectAsState()
+
+    CreateStoryScreen(
+      state = state,
+      onImageUriChanged = viewModel::onImageUriChanged,
+      onDescriptionChanged = viewModel::onDescriptionChanged,
+      onBack = {
+        navController.popBackStack()
+      },
+      onUpload = {
+        viewModel.onSubmit {
+          // TODO: need to update the home screen with UiStatus.Loading state
+          //  or just navigate to the home screen - for now?
+          navController.popBackStack()
+        }
+      },
+      onClear = viewModel::onClear
     )
   }
 }

@@ -31,6 +31,7 @@ retrofit = "2.11.0"
 sandwich = "2.0.10"
 orbitMvi = "9.0.0"
 accompanistPermission = "0.37.0"
+composeUnstyled = "1.20.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -88,6 +89,8 @@ orbitMvi-compose = { group = "org.orbit-mvi", name = "orbit-compose", version.re
 orbitMvi-test = { group = "org.orbit-mvi", name = "orbit-test", version.ref = "orbitMvi" }
 # accompanist
 accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermission" }
+# compose unstyled
+compose-unstyled = { module = "com.composables:core", version.ref = "composeUnstyled" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

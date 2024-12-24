@@ -10,7 +10,7 @@
     <string name="err_invalid_credentials">Email atau password tidak valid.</string>
     <string name="err_duplicated_credentials">Email telah terpakai.</string>
     <string name="err_camera_interrupted">Ambil gambar dibatalkan atau terganggu…</string>
-    <string name="err_pick_from_gallery_interrupted">Ambil gambar dari galeru dibatalkan atau terganggu…</string>
+    <string name="err_pick_from_gallery_interrupted">Ambil gambar dari galeri dibatalkan atau terganggu…</string>
     <string name="err_form_image_too_large">Ukuran gambar terlalu besar!</string>
     <string name="err_form_image_required">Gambar diperlukan dan tidak boleh kosong.</string>
     <string name="form_image_max_size_info">Maksimal besar gambar yang bisa diupload adalah 1MB.</string>
