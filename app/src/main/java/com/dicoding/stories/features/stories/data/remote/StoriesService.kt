@@ -1,11 +1,16 @@
 package com.dicoding.stories.features.stories.data.remote
 
 import com.skydoves.sandwich.ApiResponse
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import okhttp3.RequestBody
+import retrofit2.http.*
 
 interface StoriesService {
+  
+  @POST("stories")
+  suspend fun createStory(
+    @Body body: RequestBody,
+  ): ApiResponse<CreateStoryResponse>
+
   @GET("stories")
   suspend fun getStories(
     @Query("page") page: Int = 0,

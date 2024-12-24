@@ -31,6 +31,7 @@ import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.screens.CreateStoryScreen
 import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
+import com.dicoding.stories.features.stories.presentation.viewmodel.create.CreateStorySideEffect
 import com.dicoding.stories.features.stories.presentation.viewmodel.create.CreateStoryViewModel
 import com.dicoding.stories.features.stories.presentation.viewmodel.details.StoryDetailsViewModel
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
@@ -240,8 +241,25 @@ private fun NavGraphBuilder.addStoryDetail(navController: NavHostController) {
 
 private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
   composable<AppRoutes.CreateStory> {
+    val context = LocalContext.current
+
     val viewModel = hiltViewModel<CreateStoryViewModel>()
     val state by viewModel.collectAsState()
+
+    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+
+    viewModel.collectSideEffect { effect ->
+      when (effect) {
+        CreateStorySideEffect.OnSuccessNavigateBack -> {
+          navController.popBackStack()
+          homeViewModel.refresh()
+        }
+
+        is CreateStorySideEffect.ShowMessage -> {
+          context.showToast(effect.message)
+        }
+      }
+    }
 
     CreateStoryScreen(
       state = state,
@@ -250,14 +268,8 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       onBack = {
         navController.popBackStack()
       },
-      onUpload = {
-        viewModel.onSubmit {
-          // TODO: need to update the home screen with UiStatus.Loading state
-          //  or just navigate to the home screen - for now?
-          navController.popBackStack()
-        }
-      },
-      onClear = viewModel::onClear
+      onUpload = viewModel::onSubmit,
+      onClear = viewModel::onClear,
     )
   }
 }

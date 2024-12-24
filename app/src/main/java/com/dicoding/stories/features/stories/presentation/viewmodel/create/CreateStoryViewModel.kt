@@ -4,18 +4,22 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dicoding.stories.R
-import com.dicoding.stories.features.stories.domain.models.Story
+import com.dicoding.stories.features.stories.domain.business.CreateStoryUseCase
 import com.dicoding.stories.shared.lib.utils.validateFileSize
+import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateStoryViewModel @Inject constructor() : ViewModel(),
+class CreateStoryViewModel @Inject constructor(
+  private val createStoryUseCase: CreateStoryUseCase,
+) : ViewModel(),
   ContainerHost<CreateStoryState, CreateStorySideEffect> {
 
   override val container =
@@ -66,12 +70,47 @@ class CreateStoryViewModel @Inject constructor() : ViewModel(),
     }
   }
 
-  fun onSubmit(onSuccess: (Story) -> Unit = {}) {
+  fun onSubmit() {
     intent {
-      withContext(Dispatchers.Main) {
-        val isValid = validateImageFull(state.image) == null
-        if (isValid) onSuccess(Story.dummy())
-        reduce { CreateStoryState.initial() }
+      reduce { state.copy(status = UiStatus.Loading) }
+
+      val isValid = withContext(Dispatchers.Main) {
+        reduce {
+          state.copy(
+            descriptionError = state.validateDescription(state.description)
+          )
+        }
+        return@withContext validateImageFull(state.image) == null
+          && state.descriptionError == null
+      }
+
+      if (isValid) {
+        container.scope.launch {
+          createStoryUseCase(
+            CreateStoryUseCase.Params(
+              image = (state.image ?: Uri.EMPTY).toString(),
+              description = state.description
+            )
+          )
+            .fold(
+              onSuccess = {
+                reduce { CreateStoryState.initial() }
+                postSideEffect(CreateStorySideEffect.OnSuccessNavigateBack)
+                postSideEffect(
+                  CreateStorySideEffect.ShowMessage(
+                    "Story created successfully!"
+                  )
+                )
+              },
+              onFailure = {
+                postSideEffect(
+                  CreateStorySideEffect.ShowMessage(
+                    it.message ?: "Uh oh! Something went wrong..."
+                  )
+                )
+              }
+            )
+        }
       }
     }
   }
