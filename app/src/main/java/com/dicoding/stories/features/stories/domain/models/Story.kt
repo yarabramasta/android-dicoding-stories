@@ -27,5 +27,13 @@ data class Story(
       photoUrl = "https://placehold.co/1080.png",
       createdAt = "2021-07-01T00:00:00Z",
     )
+
+    fun placeholder() = Story(
+      id = "...",
+      name = "...",
+      description = "Please wait while we fetching the story details.",
+      photoUrl = "",
+      createdAt = "..."
+    )
   }
 }

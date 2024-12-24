@@ -34,10 +34,10 @@ fun StoryListItem(
           R.string.story_uploaded_by,
           story.name
         ),
-        loading = { ShimmerBox(modifier = Modifier.size(64.dp)) },
+        loading = { ShimmerBox(modifier = Modifier.size(80.dp)) },
         error = {
           ShimmerBox(
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(80.dp),
             animate = false
           )
         },

@@ -3,6 +3,7 @@ package com.dicoding.stories.shared.ui.composables
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -21,17 +22,24 @@ import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
 fun ShimmerBox(
   modifier: Modifier = Modifier,
   animate: Boolean = true,
+  rounded: Boolean = true,
 ) {
   if (animate) {
     Box(
       modifier = modifier
-        .clip(MaterialTheme.shapes.small)
+        .clip(
+          if (rounded) MaterialTheme.shapes.small
+          else RoundedCornerShape(0.dp)
+        )
         .shimmerEffect()
     )
   } else {
     Box(
       modifier = modifier
-        .clip(MaterialTheme.shapes.small)
+        .clip(
+          if (rounded) MaterialTheme.shapes.small
+          else RoundedCornerShape(0.dp)
+        )
         .background(color = MaterialTheme.colorScheme.surfaceContainerHigh),
     )
   }
