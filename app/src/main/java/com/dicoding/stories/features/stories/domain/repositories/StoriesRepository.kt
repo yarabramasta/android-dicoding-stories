@@ -9,4 +9,6 @@ interface StoriesRepository {
     size: Int = 10,
     location: Int = 0,
   ): Flow<Result<List<Story>>>
+
+  suspend fun getStoryDetails(id: String): Result<Story>
 }

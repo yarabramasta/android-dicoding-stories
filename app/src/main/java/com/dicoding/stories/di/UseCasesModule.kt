@@ -6,6 +6,7 @@ import com.dicoding.stories.features.auth.domain.business.SignOutUseCase
 import com.dicoding.stories.features.auth.domain.business.SignUpUseCase
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
 import com.dicoding.stories.features.stories.domain.business.GetStoriesUseCase
+import com.dicoding.stories.features.stories.domain.business.GetStoryDetailUseCase
 import com.dicoding.stories.features.stories.domain.repositories.StoriesRepository
 import dagger.Module
 import dagger.Provides
@@ -52,4 +53,11 @@ object UseCasesModule {
     @IoDispatcher dispatcher: CoroutineDispatcher,
     storiesRepository: StoriesRepository,
   ) = GetStoriesUseCase(dispatcher, storiesRepository)
+
+  @Provides
+  @Singleton
+  fun provideGetStoryDetailUseCase(
+    @IoDispatcher dispatcher: CoroutineDispatcher,
+    storiesRepository: StoriesRepository,
+  ) = GetStoryDetailUseCase(dispatcher, storiesRepository)
 }

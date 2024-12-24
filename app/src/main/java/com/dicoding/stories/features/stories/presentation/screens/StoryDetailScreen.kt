@@ -10,13 +10,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -30,24 +33,28 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil3.compose.SubcomposeAsyncImage
 import com.dicoding.stories.R
 import com.dicoding.stories.features.stories.domain.models.Story
+import com.dicoding.stories.features.stories.presentation.viewmodel.details.StoryDetailsState
 import com.dicoding.stories.shared.ui.composables.ShimmerBox
+import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoryDetailScreen(
-  story: Story?,
+  state: StoryDetailsState,
+  onRefresh: () -> Unit = {},
   onBack: () -> Unit,
 ) {
   BackHandler(enabled = true) { onBack() }
 
-  val details = story ?: Story.placeholder()
+  val details = state.story ?: Story.placeholder()
 
   val scrollState = rememberLazyListState()
   val isScrolling by remember {
@@ -62,7 +69,10 @@ fun StoryDetailScreen(
   Scaffold(
     modifier = Modifier.fillMaxSize(),
   ) { innerPadding ->
-    Box {
+    PullToRefreshBox(
+      isRefreshing = state.isRefreshing,
+      onRefresh = onRefresh,
+    ) {
       TopAppBar(
         modifier = Modifier
           .drawBehind { drawRect(color = topAppBarBgColor) }
@@ -122,75 +132,143 @@ fun StoryDetailScreen(
           .padding(innerPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
-        item {
-          SubcomposeAsyncImage(
-            model = details.photoUrl,
-            contentDescription = stringResource(
-              R.string.story_uploaded_by,
-              details.name
-            ),
-            contentScale = ContentScale.FillBounds,
-            loading = {
-              ShimmerBox(
+        buildHeroImage(state.status, details.photoUrl)
+        when (state.status) {
+          is UiStatus.Failure -> {
+            item {
+              Column(
                 modifier = Modifier
                   .fillMaxWidth()
-                  .height(360.dp),
-                rounded = false,
-              )
-            },
-            error = {
-              ShimmerBox(
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .height(360.dp),
-                animate = false,
-                rounded = false,
-              )
-            },
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(360.dp)
-          )
-        }
-        item {
-          Text(
-            text = stringResource(R.string.story_uploaded_by, details.name),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-              .padding(
-                horizontal = 24.dp,
-                vertical = 8.dp
-              )
-          )
-          Text(
-            text = details.description,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-              .padding(horizontal = 24.dp)
-              .padding(bottom = 8.dp)
-          )
-        }
-        listOf(
-          DetailItem(
-            icon = Icons.Outlined.Fingerprint,
-            text = "ID - ${details.id}"
-          ),
-          DetailItem(
-            icon = Icons.Outlined.LocationOn,
-            text = "Location: latlong(${details.lat ?: -0.0}, ${details.lon ?: 0.0})"
-          ),
-          DetailItem(
-            icon = Icons.Outlined.CalendarToday,
-            text = "Created at ${details.createdAt}"
-          ),
-        ).forEach { item ->
-          item {
-            DetailItemListTile(item)
+                  .padding(horizontal = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                Icon(
+                  imageVector = Icons.Outlined.Warning,
+                  contentDescription = "Failed to load stories",
+                  modifier = Modifier.size(32.dp),
+                  tint = MaterialTheme.colorScheme.outline,
+                )
+                Text(
+                  text = "Uh oh! Failed to load story details.",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.outline,
+                  textAlign = TextAlign.Center
+                )
+                Text(
+                  text =
+                  when (state.status.message) {
+                    "UnknownException" -> "Exception: " + stringResource(R.string.err_general_trouble)
+                    else -> "Exception: ${state.status.message}"
+                  },
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.outline,
+                  textAlign = TextAlign.Center
+                )
+              }
+            }
           }
+
+          else -> buildStoryDetails(details)
         }
       }
+    }
+  }
+}
+
+private fun LazyListScope.buildHeroImage(
+  status: UiStatus,
+  photoUrl: String,
+) {
+  item {
+    when (status) {
+      UiStatus.Loading -> {
+        ShimmerBox(
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp),
+          rounded = false,
+        )
+      }
+
+      is UiStatus.Failure -> {
+        ShimmerBox(
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp),
+          animate = false,
+          rounded = false,
+        )
+      }
+
+      else -> {
+        SubcomposeAsyncImage(
+          model = photoUrl,
+          contentDescription = null,
+          contentScale = ContentScale.FillBounds,
+          loading = {
+            ShimmerBox(
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(360.dp),
+              rounded = false,
+            )
+          },
+          error = {
+            ShimmerBox(
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(360.dp),
+              animate = false,
+              rounded = false,
+            )
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+        )
+      }
+    }
+  }
+}
+
+private fun LazyListScope.buildStoryDetails(details: Story) {
+  item {
+    Text(
+      text = stringResource(R.string.story_uploaded_by, details.name),
+      style = MaterialTheme.typography.titleLarge,
+      fontWeight = FontWeight.SemiBold,
+      modifier = Modifier
+        .padding(
+          horizontal = 24.dp,
+          vertical = 8.dp
+        )
+    )
+    Text(
+      text = details.description,
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier
+        .padding(horizontal = 24.dp)
+        .padding(bottom = 8.dp)
+    )
+  }
+  listOf(
+    DetailItem(
+      icon = Icons.Outlined.Fingerprint,
+      text = "ID - ${details.id}"
+    ),
+    DetailItem(
+      icon = Icons.Outlined.LocationOn,
+      text = "Location: latlong(${details.lat ?: -0.0}, ${details.lon ?: 0.0})"
+    ),
+    DetailItem(
+      icon = Icons.Outlined.CalendarToday,
+      text = "Created at ${details.createdAt}"
+    ),
+  ).forEach { item ->
+    item {
+      DetailItemListTile(item)
     }
   }
 }
@@ -223,10 +301,44 @@ private fun DetailItemListTile(item: DetailItem) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun StoryDetailScreenPreview() {
-  val story = Story.dummy()
+  val state = StoryDetailsState
+    .initial()
+    .copy(
+      status = UiStatus.Success,
+      story = Story.dummy()
+    )
+
   DicodingStoriesTheme {
     StoryDetailScreen(
-      story = story,
+      state = state,
+      onBack = {}
+    )
+  }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun StoryDetailScreenErrorPreview() {
+  val state = StoryDetailsState
+    .initial()
+    .copy(status = UiStatus.Failure("UnknownException"))
+
+  DicodingStoriesTheme {
+    StoryDetailScreen(
+      state = state,
+      onBack = {}
+    )
+  }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun StoryDetailScreenLoadingPreview() {
+  val state = StoryDetailsState.initial()
+
+  DicodingStoriesTheme {
+    StoryDetailScreen(
+      state = state,
       onBack = {}
     )
   }

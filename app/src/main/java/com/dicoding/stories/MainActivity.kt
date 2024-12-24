@@ -1,7 +1,6 @@
 package com.dicoding.stories
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -31,6 +30,7 @@ import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
+import com.dicoding.stories.features.stories.presentation.viewmodel.details.StoryDetailsViewModel
 import com.dicoding.stories.shared.ui.lib.scopedViewModel
 import com.dicoding.stories.shared.ui.lib.showToast
 import com.dicoding.stories.shared.ui.navigation.AppRoutes
@@ -219,8 +219,12 @@ private fun NavGraphBuilder.addStoryDetail(navController: NavHostController) {
       typeOf<Story?>() to navType<Story?>()
     )
   ) {
+    val viewModel = hiltViewModel<StoryDetailsViewModel>()
+    val state by viewModel.collectAsState()
+
     StoryDetailScreen(
-      story = null,
+      state = state,
+      onRefresh = viewModel::refresh,
       onBack = {
         navController.popBackStack()
       }
