@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
@@ -28,6 +27,9 @@ fun EditText(
   keyboardActions: KeyboardActions = KeyboardActions.Default,
   leadingIconResource: IconResource? = null,
   onValueChange: (String) -> Unit,
+  minLines: Int = 1,
+  maxLines: Int = 1,
+  singleLine: Boolean = true,
 ) {
   var passwordVisible by remember { mutableStateOf(false) }
 
@@ -42,7 +44,9 @@ fun EditText(
       )
     },
     enabled = enabled,
-    singleLine = true,
+    singleLine = singleLine,
+    minLines = minLines,
+    maxLines = maxLines,
     keyboardOptions = keyboardOptions,
     keyboardActions = keyboardActions,
     leadingIcon = leadingIconResource?.let {
@@ -76,12 +80,14 @@ fun EditText(
           }
         }
       }
-    } else if (isError) {
-      { Icon(imageVector = Icons.Outlined.Info, contentDescription = null) }
-    } else null,
-    visualTransformation =
-    if (isPasswordField && !passwordVisible) PasswordVisualTransformation()
-    else VisualTransformation.None,
+    } else {
+      null
+    },
+    visualTransformation = if (isPasswordField && !passwordVisible) {
+      PasswordVisualTransformation()
+    } else {
+      VisualTransformation.None
+    },
     shape = MaterialTheme.shapes.medium
   )
 }

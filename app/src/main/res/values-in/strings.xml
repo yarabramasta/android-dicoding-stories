@@ -2,11 +2,18 @@
 <resources>
     <string name="tx_sign_in">Masuk</string>
     <string name="tx_sign_up">Daftar</string>
+    <string name="err_general_trouble">Terjadi masalah…</string>
     <string name="err_unauthorized">Sepertinya Anda belum masuk.</string>
     <string name="err_bad_req_sign_in">Terjadi error saat login</string>
     <string name="err_bad_req_sign_up">Terjadi error saat membuat akun.</string>
+    <string name="err_signup_trouble">Gagal membuat akun. Terjadi masalah.</string>
     <string name="err_invalid_credentials">Email atau password tidak valid.</string>
     <string name="err_duplicated_credentials">Email telah terpakai.</string>
+    <string name="err_camera_interrupted">Ambil gambar dibatalkan atau terganggu…</string>
+    <string name="err_pick_from_gallery_interrupted">Ambil gambar dari galeru dibatalkan atau terganggu…</string>
+    <string name="err_form_image_too_large">Ukuran gambar terlalu besar!</string>
+    <string name="err_form_image_required">Gambar diperlukan dan tidak boleh kosong.</string>
+    <string name="form_image_max_size_info">Maksimal besar gambar yang bisa diupload adalah 1MB.</string>
     <string name="form_label_email">Alamat Email</string>
     <string name="err_form_email_empty">Email tidak boleh kosong.</string>
     <string name="err_form_email_invalid">Alamat email tidak valid.</string>
@@ -16,8 +23,8 @@
     <string name="form_label_name">Nama Lengkap</string>
     <string name="err_form_name_empty">Nama tidak boleh kosong.</string>
     <string name="err_form_name_invalid">Nama harus memiliki se-tidaknya 2 karakter.</string>
-    <string name="err_general_trouble">Terjadi masalah…</string>
-    <string name="err_signup_trouble">Gagal membuat akun. Terjadi masalah.</string>
+    <string name="form_label_description">Description</string>
+    <string name="err_form_description_empty">Description must not be empty.</string>
     <string name="onboarding_headline">Selamat datang di Dicoding Story!</string>
     <string name="onboarding_sub_headline">Mau berbagi ilmu tentang Android, iOS, Machine Learning, Cloud, Front-end, Back-end, dan bidang IT lainnya? Di Dicoding Story aja!</string>
     <string name="sign_in_headline">Sudah siap untuk berbagi cerita?</string>
@@ -29,4 +36,7 @@
     <string name="home_headline">Selamat datang di Dicoding Stories</string>
     <string name="home_sub_headline">Lihat stories terbari dari Dicoding, atau buat stories kamu sendiri menggunakan (+) button di bawah.</string>
     <string name="story_uploaded_by">Story diupload oleh %1$s</string>
+    <string name="pick_picture_description">Tangkap gambar atau ambil dari galeri.</string>
+    <string name="capture_from_camera">Tangkap dari kamera</string>
+    <string name="pick_from_gallery">Ambil dari galeri</string>
 </resources>

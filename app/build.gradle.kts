@@ -128,4 +128,6 @@ dependencies {
   implementation(libs.orbitMvi.viewmodel)
   implementation(libs.orbitMvi.compose)
   implementation(libs.orbitMvi.test)
+  //  accompanist
+  implementation(libs.accompanist.permission)
 }

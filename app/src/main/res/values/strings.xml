@@ -29,4 +29,14 @@
     <string name="home_headline">Welcome to Dicoding Stories</string>
     <string name="home_sub_headline">See the latest stories from Dicoding, or create your own stories using the (+) button below.</string>
     <string name="story_uploaded_by">Story uploaded by %1$s</string>
+    <string name="err_camera_interrupted">Take picture is canceled or interrupted…</string>
+    <string name="err_pick_from_gallery_interrupted">Pick image from gallery is canceled or interrupted…</string>
+    <string name="err_form_image_too_large">Image size is too large!</string>
+    <string name="err_form_image_required">Image is required and cannot be empty.</string>
+    <string name="err_form_description_empty">Description must not be empty.</string>
+    <string name="form_label_description">Description</string>
+    <string name="form_image_max_size_info">Max picture size that can be uploaded is 1MB.</string>
+    <string name="pick_picture_description">Capture a picture or pick from gallery.</string>
+    <string name="capture_from_camera">Capture from camera</string>
+    <string name="pick_from_gallery">Pick from gallery</string>
 </resources>
