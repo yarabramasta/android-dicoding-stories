@@ -24,7 +24,7 @@ android {
 
   defaultConfig {
     applicationId = "com.dicoding.stories"
-    minSdk = 26
+    minSdk = 28
     //noinspection OldTargetApi
     targetSdk = 34
     versionCode = 1

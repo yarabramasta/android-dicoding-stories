@@ -14,13 +14,8 @@ class CreateStoryUseCase @Inject constructor(
 ) : UseCase<CreateStoryUseCase.Params, Boolean>(dispatcher) {
 
   override suspend fun execute(params: Params): Result<Boolean> {
-    if (params.image.isEmpty()) {
-      return Result.failure(IllegalArgumentException("Image path is empty."))
-    }
-
-    val image = File(params.image)
     return storiesRepository.createStory(
-      image = image,
+      image = params.image,
       description = params.description,
       lat = params.lat,
       lon = params.lon
@@ -29,7 +24,7 @@ class CreateStoryUseCase @Inject constructor(
 
   @Immutable
   data class Params(
-    val image: String,
+    val image: File,
     val description: String,
     val lat: Double? = null,
     val lon: Double? = null,

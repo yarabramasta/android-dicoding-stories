@@ -1,14 +1,19 @@
 package com.dicoding.stories.features.stories.data.remote
 
 import com.skydoves.sandwich.ApiResponse
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface StoriesService {
-  
+
+  @Multipart
   @POST("stories")
   suspend fun createStory(
-    @Body body: RequestBody,
+    @Part("description") description: RequestBody,
+    @Part("lat") lat: RequestBody?,
+    @Part("lon") lon: RequestBody?,
+    @Part photo: MultipartBody.Part,
   ): ApiResponse<CreateStoryResponse>
 
   @GET("stories")

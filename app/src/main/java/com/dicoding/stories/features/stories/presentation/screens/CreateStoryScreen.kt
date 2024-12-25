@@ -1,6 +1,11 @@
+@file:Suppress("UNUSED_ANONYMOUS_PARAMETER")
+
 package com.dicoding.stories.features.stories.presentation.screens
 
 import android.Manifest
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -63,9 +68,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 fun CreateStoryScreen(
   state: CreateStoryState,
   onDescriptionChanged: (String) -> Unit = {},
-  onImageUriChanged: (Uri?) -> Unit = {},
+  onImageUriChanged: (Uri?, Bitmap?) -> Unit = { uri, bitmap -> },
   onBack: () -> Unit = {},
-  onUpload: () -> Unit = {},
+  onUpload: (Context) -> Unit = {},
   onClear: () -> Unit = {},
 ) {
   val isKeyboardOpen by keyboardAsState()
@@ -73,8 +78,9 @@ fun CreateStoryScreen(
 
   val context = LocalContext.current
   var imageUri by remember { mutableStateOf<Uri?>(Uri.EMPTY) }
+  var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-  val cameraTargetfile = context.createImageFile()
+  val cameraTargetfile = ImageUtils.createImageFile(context)
   val cameraTargetUri = FileProvider.getUriForFile(
     context,
     BuildConfig.APPLICATION_ID + ".fileProvider",
@@ -84,18 +90,26 @@ fun CreateStoryScreen(
   val cameraLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.TakePicture()
   ) { success ->
-    if (success) imageUri = cameraTargetUri
+    if (success) {
+      imageUri = cameraTargetUri
+      val source = ImageDecoder.createSource(
+        context.contentResolver, cameraTargetUri
+      )
+      imageBitmap = ImageDecoder.decodeBitmap(source)
+    }
     if ((imageUri?.toString() ?: "").isNotEmpty()) {
       if (validateFileSize(imageUri.toString(), 1)) {
-        onImageUriChanged(cameraTargetUri)
+        onImageUriChanged(imageUri, imageBitmap)
       } else {
         imageUri = Uri.EMPTY
-        onImageUriChanged(Uri.EMPTY)
+        imageBitmap = null
+        onImageUriChanged(Uri.EMPTY, null)
         context.showToast(context.getString(R.string.err_form_image_too_large))
       }
     } else {
       imageUri = Uri.EMPTY
-      onImageUriChanged(Uri.EMPTY)
+      imageBitmap = null
+      onImageUriChanged(Uri.EMPTY, null)
       context.showToast(
         context.getString(R.string.err_camera_interrupted)
       )
@@ -113,18 +127,27 @@ fun CreateStoryScreen(
   val galleryLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.PickVisualMedia()
   ) { uri ->
-    if (uri != null) imageUri = uri
+    if (uri != null) {
+      imageUri = uri
+      val source = ImageDecoder.createSource(
+        context.contentResolver, uri
+      )
+      imageBitmap = ImageDecoder.decodeBitmap(source)
+    }
+
     if ((imageUri?.toString() ?: "").isNotEmpty()) {
       if (validateFileSize(imageUri.toString(), 1)) {
-        onImageUriChanged(uri)
+        onImageUriChanged(imageUri, imageBitmap)
       } else {
         imageUri = Uri.EMPTY
-        onImageUriChanged(Uri.EMPTY)
+        imageBitmap = null
+        onImageUriChanged(Uri.EMPTY, null)
         context.showToast(context.getString(R.string.err_form_image_too_large))
       }
     } else {
       imageUri = Uri.EMPTY
-      onImageUriChanged(Uri.EMPTY)
+      imageBitmap = null
+      onImageUriChanged(Uri.EMPTY, null)
       context.showToast(
         context.getString(R.string.err_pick_from_gallery_interrupted)
       )
@@ -156,7 +179,9 @@ fun CreateStoryScreen(
   CreateStoryScreenScaffold(
     state = state,
     onBack = onBack,
-    onUpload = onUpload,
+    onUpload = {
+      onUpload(context)
+    },
     onClear = {
       imageUri = Uri.EMPTY
       onClear()
@@ -256,7 +281,7 @@ private fun CreateStoryScreenScaffold(
           ) {
             Text(text = "Upload")
           }
-          if ((state.image?.toString() ?: "").isNotEmpty()) {
+          if ((state.imageUri?.toString() ?: "").isNotEmpty()) {
             OutlinedButton(
               modifier = Modifier.fillMaxWidth(),
               enabled = state.status !is UiStatus.Loading,
@@ -358,7 +383,7 @@ private fun CreateStoryScreenContent(
   state: CreateStoryState,
   onImagePickerCardClick: () -> Unit = {},
   onDescriptionChanged: (String) -> Unit = {},
-  onImageUriChanged: (Uri?) -> Unit = {},
+  onImageUriChanged: (Uri?, Bitmap?) -> Unit = { uri, bitmap -> },
 ) {
   LazyColumn(
     modifier = modifier.fillMaxSize(),
@@ -366,7 +391,7 @@ private fun CreateStoryScreenContent(
     contentPadding = PaddingValues(24.dp)
   ) {
     item {
-      if ((state.image?.toString() ?: "").isNotEmpty()) {
+      if ((state.imageUri?.toString() ?: "").isNotEmpty()) {
         Card(
           modifier = Modifier
             .fillMaxWidth()
@@ -375,7 +400,7 @@ private fun CreateStoryScreenContent(
           enabled = state.status !is UiStatus.Loading
         ) {
           SubcomposeAsyncImage(
-            model = state.image?.toString() ?: "",
+            model = state.imageUri?.toString() ?: "",
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
             loading = {
@@ -523,7 +548,7 @@ private fun CreateStoryScreenRevealBottomSheetPreview() {
 private fun CreateStoryScreenHasImagePreview() {
   val state = CreateStoryState
     .initial()
-    .copy(image = Uri.parse("https://placehold.co/1080.png"))
+    .copy(imageUri = Uri.parse("https://placehold.co/1080.png"))
 
   DicodingStoriesTheme {
     CreateStoryScreenScaffold(state = state) { modifier, _ ->

@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.dicoding.stories.features.auth.presentation.screens.OnboardingScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignInScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignUpScreen
@@ -56,9 +57,11 @@ class MainActivity : AppCompatActivity() {
 
     setContent {
       val authState by authViewModel.collectAsState()
-      val startDestination =
-        if (authState.session != null) AppRoutes.Home
-        else AppRoutes.Onboarding
+      val startDestination = if (authState.session != null) {
+        AppRoutes.Main
+      } else {
+        AppRoutes.Onboarding
+      }
 
       val navController = rememberNavController()
 
@@ -72,9 +75,12 @@ class MainActivity : AppCompatActivity() {
           addOnboarding(navController = navController)
           addSignIn(navController = navController)
           addSignUp(navController = navController)
-          addHome(navController = navController)
-          addStoryDetail(navController = navController)
-          addCreateStory(navController = navController)
+
+          navigation<AppRoutes.Main>(startDestination = AppRoutes.Home) {
+            addHome(navController = navController)
+            addStoryDetail(navController = navController)
+            addCreateStory(navController = navController)
+          }
         }
       }
     }
@@ -252,7 +258,6 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       when (effect) {
         CreateStorySideEffect.OnSuccessNavigateBack -> {
           navController.popBackStack()
-          homeViewModel.refresh()
         }
 
         is CreateStorySideEffect.ShowMessage -> {
@@ -268,7 +273,11 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       onBack = {
         navController.popBackStack()
       },
-      onUpload = viewModel::onSubmit,
+      onUpload = { uploadContext ->
+        viewModel.onSubmit(uploadContext) {
+          homeViewModel.refresh()
+        }
+      },
       onClear = viewModel::onClear,
     )
   }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
 import javax.inject.Inject
@@ -17,36 +18,36 @@ import javax.inject.Inject
 class StoriesRepositoryImpl @Inject constructor(
   private val storiesService: StoriesService,
 ) : StoriesRepository {
+
   override suspend fun createStory(
     image: File,
     description: String,
     lat: Double?,
     lon: Double?,
   ): Result<Boolean> {
-    val body = MultipartBody.Builder()
-      .setType(MultipartBody.FORM)
-      .addFormDataPart("description", description)
-      .addFormDataPart(
-        "photo",
-        image.name,
-        image.asRequestBody("image/*".toMediaType())
-      )
-      .let { builder ->
-        lat?.let { builder.addFormDataPart("lat", it.toString()) }
-        lon?.let { builder.addFormDataPart("lon", it.toString()) }
-        builder.build()
-      }
+    val descReqBody = description.toRequestBody("text/plain".toMediaType())
+    val photo = MultipartBody.Part.createFormData(
+      "photo",
+      image.name,
+      image.asRequestBody("multipart/form-data".toMediaType())
+    )
 
     var result = Result.failure<Boolean>(Throwable("UnknownError"))
 
     storiesService
-      .createStory(body)
+      .createStory(
+        photo = photo,
+        description = descReqBody,
+        lat = lat?.toString()?.toRequestBody("text/plain".toMediaType()),
+        lon = lon?.toString()?.toRequestBody("text/plain".toMediaType())
+      )
       .onSuccess { result = Result.success(true) }
       .onFailure { result = Result.failure(Throwable("UnkownError")) }
       .onError {
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         result = when (statusCode) {
           401 -> Result.failure(Throwable("Unauthorized"))
+          413 -> Result.failure(Throwable("FileTooLarge"))
           else -> Result.failure(Throwable("UnkownError"))
         }
       }
