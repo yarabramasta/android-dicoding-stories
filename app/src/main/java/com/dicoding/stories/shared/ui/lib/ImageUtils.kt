@@ -23,28 +23,24 @@ object ImageUtils {
 
   suspend fun processImage(
     context: Context,
-    bitmap: Bitmap? = null,
-    uri: Uri? = null,
+    bitmap: Bitmap,
+    uri: Uri,
   ): File {
     return withContext(Dispatchers.IO) {
-      if (bitmap != null && uri != null) {
-        var fileName = File(uri.path ?: "").name
-        listOf(".jpg", ".jpeg", ".png").let { extensions ->
-          if (!extensions.any { fileName.endsWith(it) }) {
-            fileName = "$fileName.jpeg"
-          }
+      var fileName = File(uri.path ?: "").name
+      listOf(".jpg", ".jpeg", ".png").let { extensions ->
+        if (!extensions.any { fileName.endsWith(it) }) {
+          fileName = "$fileName.webp"
         }
+      }
 
-        try {
-          val file = File(context.externalCacheDir, fileName)
-          file.write(bitmap)
-          return@withContext file
-        } catch (e: IOException) {
-          Log.e("CreateStoryViewModel", "Error writing bitmap", e)
-          throw e
-        }
-      } else {
-        throw IllegalArgumentException("Bitmap and Uri cannot be null at the same time")
+      try {
+        val file = File(context.externalCacheDir, fileName)
+        file.write(bitmap)
+        return@withContext file
+      } catch (e: IOException) {
+        Log.e("CreateStoryViewModel", "Error writing bitmap", e)
+        throw e
       }
     }
   }
@@ -55,9 +51,10 @@ object ImageUtils {
     createNewFile()
   }
 
+  @Suppress("DEPRECATION")
   private fun File.write(
     bitmap: Bitmap,
-    format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG,
+    format: Bitmap.CompressFormat = Bitmap.CompressFormat.WEBP,
     quality: Int = 95,
   ) = apply {
     createFileAndDirs()

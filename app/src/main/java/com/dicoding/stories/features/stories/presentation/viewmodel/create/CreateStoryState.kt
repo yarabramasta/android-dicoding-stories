@@ -28,7 +28,7 @@ data class CreateStoryState(
   }
 
   fun validateImage(uri: Uri?, bitmap: Bitmap?): UiText? {
-    return if ((uri?.toString() ?: "").isEmpty() && bitmap != null) {
+    return if ((uri?.toString() ?: "").isEmpty() && bitmap == null) {
       UiText.StringResource(R.string.err_form_image_required)
     } else {
       null

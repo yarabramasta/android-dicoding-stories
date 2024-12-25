@@ -39,5 +39,5 @@
     <string name="pick_picture_description">Tangkap gambar atau ambil dari galeri.</string>
     <string name="capture_from_camera">Tangkap dari kamera</string>
     <string name="pick_from_gallery">Ambil dari galeri</string>
-    <!--    <string name="story_created_successfully">Selamat! story kamu berhasil diupload.</string>-->
+    <string name="story_created_successfully">Selamat! story kamu berhasil diupload.</string>
 </resources>

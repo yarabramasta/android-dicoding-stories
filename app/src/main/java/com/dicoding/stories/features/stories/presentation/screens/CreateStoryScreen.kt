@@ -14,6 +14,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -416,6 +417,10 @@ private fun CreateStoryScreenContent(
             .fillMaxWidth()
             .height(360.dp),
           onClick = onImagePickerCardClick,
+          border = BorderStroke(
+            1.dp,
+            if (state.imageError != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
+          ),
           enabled = state.status !is UiStatus.Loading
         ) {
           Column(
@@ -432,12 +437,12 @@ private fun CreateStoryScreenContent(
               imageVector = Icons.Outlined.Image,
               contentDescription = null,
               modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.outline,
+              tint = if (state.imageError != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
             )
             Text(
               text = stringResource(R.string.pick_picture_description),
               style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.outline,
+              color = if (state.imageError != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
               textAlign = TextAlign.Center
             )
           }
