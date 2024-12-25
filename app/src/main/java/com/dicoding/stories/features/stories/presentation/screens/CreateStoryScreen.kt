@@ -53,7 +53,6 @@ import com.composables.core.SheetDetent.Companion.Hidden
 import com.dicoding.stories.BuildConfig
 import com.dicoding.stories.R
 import com.dicoding.stories.features.stories.presentation.viewmodel.create.CreateStoryState
-import com.dicoding.stories.shared.lib.utils.validateFileSize
 import com.dicoding.stories.shared.ui.composables.EditText
 import com.dicoding.stories.shared.ui.composables.ShimmerBox
 import com.dicoding.stories.shared.ui.lib.*
@@ -98,14 +97,7 @@ fun CreateStoryScreen(
       imageBitmap = ImageDecoder.decodeBitmap(source)
     }
     if ((imageUri?.toString() ?: "").isNotEmpty()) {
-      if (validateFileSize(imageUri.toString(), 1)) {
-        onImageUriChanged(imageUri, imageBitmap)
-      } else {
-        imageUri = Uri.EMPTY
-        imageBitmap = null
-        onImageUriChanged(Uri.EMPTY, null)
-        context.showToast(context.getString(R.string.err_form_image_too_large))
-      }
+      onImageUriChanged(imageUri, imageBitmap)
     } else {
       imageUri = Uri.EMPTY
       imageBitmap = null
@@ -136,14 +128,7 @@ fun CreateStoryScreen(
     }
 
     if ((imageUri?.toString() ?: "").isNotEmpty()) {
-      if (validateFileSize(imageUri.toString(), 1)) {
-        onImageUriChanged(imageUri, imageBitmap)
-      } else {
-        imageUri = Uri.EMPTY
-        imageBitmap = null
-        onImageUriChanged(Uri.EMPTY, null)
-        context.showToast(context.getString(R.string.err_form_image_too_large))
-      }
+      onImageUriChanged(imageUri, imageBitmap)
     } else {
       imageUri = Uri.EMPTY
       imageBitmap = null

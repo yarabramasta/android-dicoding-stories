@@ -56,7 +56,7 @@ class AuthRepositoryImpl @Inject constructor(
     email: String,
     password: String,
   ): Result<Boolean> {
-    var result: Result<Boolean> = Result.failure(Throwable())
+    var result: Result<Boolean> = Result.failure(AuthException.BadRequestSignUp())
 
     authService.register(RegisterBody(name, email, password))
       .onSuccess { result = Result.success(true) }
@@ -64,7 +64,7 @@ class AuthRepositoryImpl @Inject constructor(
         val statusCode = (payload as? Response<*>)?.code() ?: 500
         result = when (statusCode) {
           400 -> Result.failure(AuthException.DuplicatedCredentials())
-          else -> result
+          else -> Result.failure(AuthException.InvalidCredentials())
         }
       }
 

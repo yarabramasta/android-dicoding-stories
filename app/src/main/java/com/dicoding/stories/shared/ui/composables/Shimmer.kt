@@ -67,14 +67,6 @@ fun ShimmerItem(
           animate = animate
         )
       },
-//      overlineContent = {
-//        ShimmerBox(
-//          modifier = Modifier
-//            .width(56.dp)
-//            .height(12.dp),
-//          animate = animate
-//        )
-//      },
       supportingContent = {
         ShimmerBox(
           modifier = Modifier
@@ -83,14 +75,6 @@ fun ShimmerItem(
           animate = animate
         )
       },
-//      trailingContent = {
-//        IconButton(onClick = { }, enabled = false) {
-//          Icon(
-//            Icons.Outlined.StarOutline,
-//            contentDescription = "Favorite"
-//          )
-//        }
-//      },
     )
   }
 }

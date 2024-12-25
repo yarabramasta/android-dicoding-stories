@@ -50,12 +50,12 @@ object ImageUtils {
   }
 
 
-  fun File.createFileAndDirs() = apply {
+  private fun File.createFileAndDirs() = apply {
     parentFile?.mkdirs()
     createNewFile()
   }
 
-  fun File.write(
+  private fun File.write(
     bitmap: Bitmap,
     format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG,
     quality: Int = 95,

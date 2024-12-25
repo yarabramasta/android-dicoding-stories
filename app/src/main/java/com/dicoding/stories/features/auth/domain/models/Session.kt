@@ -11,9 +11,4 @@ data class Session(
   companion object {
     fun default() = Session("", "", "")
   }
-
-  fun getUserAvatar(): String {
-    val seed = name.lowercase().trim().replace(" ", "-")
-    return "https://api.dicebear.com/9.x/notionists-neutral/png?seed=$seed"
-  }
 }

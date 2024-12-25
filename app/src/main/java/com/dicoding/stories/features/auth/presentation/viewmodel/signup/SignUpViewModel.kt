@@ -102,7 +102,7 @@ class SignUpViewModel @Inject constructor(
                     R.string.err_bad_req_sign_up
                   ).asString(context)
 
-                  else -> UiText.StringResource(R.string.err_general_trouble)
+                  else -> UiText.StringResource(R.string.err_signup_trouble)
                     .asString(context)
                 }
 
