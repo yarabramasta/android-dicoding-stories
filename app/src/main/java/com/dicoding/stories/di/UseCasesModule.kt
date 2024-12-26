@@ -6,6 +6,7 @@ import com.dicoding.stories.features.auth.domain.business.SignOutUseCase
 import com.dicoding.stories.features.auth.domain.business.SignUpUseCase
 import com.dicoding.stories.features.auth.domain.repositories.AuthRepository
 import com.dicoding.stories.features.stories.domain.business.CreateStoryUseCase
+import com.dicoding.stories.features.stories.domain.business.GetStoriesLocationsUseCase
 import com.dicoding.stories.features.stories.domain.business.GetStoriesUseCase
 import com.dicoding.stories.features.stories.domain.business.GetStoryDetailUseCase
 import com.dicoding.stories.features.stories.domain.repositories.StoriesRepository
@@ -54,6 +55,13 @@ object UseCasesModule {
     @IoDispatcher dispatcher: CoroutineDispatcher,
     storiesRepository: StoriesRepository,
   ) = GetStoriesUseCase(dispatcher, storiesRepository)
+
+  @Provides
+  @Singleton
+  fun provideGetStoriesLocationsUseCase(
+    @IoDispatcher dispatcher: CoroutineDispatcher,
+    storiesRepository: StoriesRepository,
+  ) = GetStoriesLocationsUseCase(dispatcher, storiesRepository)
 
   @Provides
   @Singleton

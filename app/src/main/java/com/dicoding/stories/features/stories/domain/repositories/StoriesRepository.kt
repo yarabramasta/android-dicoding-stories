@@ -12,11 +12,13 @@ interface StoriesRepository {
     lon: Double? = null,
   ): Result<Boolean>
 
-  fun getAllStories(
+  fun getStories(
     page: Int = 0,
     size: Int = 10,
     location: Int = 0,
   ): Flow<Result<List<Story>>>
+
+  fun getStoriesLocations(): Flow<Result<List<Story>>>
 
   suspend fun getStoryDetails(id: String): Result<Story>
 }

@@ -55,7 +55,7 @@ class StoriesRepositoryImpl @Inject constructor(
     return result
   }
 
-  override fun getAllStories(
+  override fun getStories(
     page: Int,
     size: Int,
     location: Int,
@@ -70,6 +70,10 @@ class StoriesRepositoryImpl @Inject constructor(
           else -> emit(Result.failure(Throwable("UnkownError")))
         }
       }
+  }
+
+  override fun getStoriesLocations(): Flow<Result<List<Story>>> {
+    return getStories(0, 30, 1)
   }
 
   override suspend fun getStoryDetails(id: String): Result<Story> {

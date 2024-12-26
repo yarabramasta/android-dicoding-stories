@@ -40,6 +40,7 @@ android {
     }
 
     loadConfig("String", "DICODING_EVENTS_API_BASE_URL", "")
+    loadConfig("String", "MAPS_API_KEY", "")
 
     resourceConfigurations.plus(listOf("en", "in"))
   }
@@ -132,4 +133,6 @@ dependencies {
   implementation(libs.accompanist.permission)
   //  compose unstyled
   implementation(libs.compose.unstyled)
+  //  google maps
+  implementation(libs.google.maps)
 }

@@ -40,4 +40,5 @@
     <string name="capture_from_camera">Tangkap dari kamera</string>
     <string name="pick_from_gallery">Ambil dari galeri</string>
     <string name="story_created_successfully">Selamat! story kamu berhasil diupload.</string>
+    <string name="see_stories_locations">Lihat lokasi stories</string>
 </resources>

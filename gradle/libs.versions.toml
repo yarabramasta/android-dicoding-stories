@@ -32,6 +32,7 @@ sandwich = "2.0.10"
 orbitMvi = "9.0.0"
 accompanistPermission = "0.37.0"
 composeUnstyled = "1.20.0"
+googleMaps = "6.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -91,6 +92,8 @@ orbitMvi-test = { group = "org.orbit-mvi", name = "orbit-test", version.ref = "o
 accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermission" }
 # compose unstyled
 compose-unstyled = { module = "com.composables:core", version.ref = "composeUnstyled" }
+# google maps
+google-maps = { group = "com.google.maps.android", name = "maps-compose", version.ref = "googleMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

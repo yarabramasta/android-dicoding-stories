@@ -40,4 +40,5 @@
     <string name="capture_from_camera">Capture from camera</string>
     <string name="pick_from_gallery">Pick from gallery</string>
     <string name="story_created_successfully">Congrats! your story successfully uploaded.</string>
+    <string name="see_stories_locations">See stories locations</string>
 </resources>

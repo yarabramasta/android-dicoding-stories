@@ -29,6 +29,8 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpVi
 import com.dicoding.stories.features.home.presentation.screens.HomeScreen
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
+import com.dicoding.stories.features.locations.presentation.screens.StoriesLocationsScreen
+import com.dicoding.stories.features.locations.presentation.viewmodel.StoriesLocationsViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.screens.CreateStoryScreen
 import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
@@ -78,6 +80,7 @@ class MainActivity : AppCompatActivity() {
 
           navigation<AppRoutes.Main>(startDestination = AppRoutes.Home) {
             addHome(navController = navController)
+            addStoriesLocations(navController = navController)
             addStoryDetail(navController = navController)
             addCreateStory(navController = navController)
           }
@@ -218,8 +221,26 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
           authViewModel.set(null)
         }
       },
+      onNavigateStoriesLocations = {
+        navController.navigate(AppRoutes.StoriesLocations)
+      },
       onNavigateCreateStory = {
         navController.navigate(AppRoutes.CreateStory)
+      }
+    )
+  }
+}
+
+private fun NavGraphBuilder.addStoriesLocations(navController: NavHostController) {
+  composable<AppRoutes.StoriesLocations> {
+    val viewModel = hiltViewModel<StoriesLocationsViewModel>()
+    val state by viewModel.collectAsState()
+
+    StoriesLocationsScreen(
+      state = state,
+      onRefresh = viewModel::refresh,
+      onBack = {
+        navController.popBackStack()
       }
     )
   }

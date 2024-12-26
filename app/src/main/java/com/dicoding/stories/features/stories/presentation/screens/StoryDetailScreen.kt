@@ -44,6 +44,7 @@ import com.dicoding.stories.features.stories.presentation.viewmodel.details.Stor
 import com.dicoding.stories.shared.ui.composables.ShimmerBox
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
+import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,11 +261,11 @@ private fun LazyListScope.buildStoryDetails(details: Story) {
     ),
     DetailItem(
       icon = Icons.Outlined.LocationOn,
-      text = "Location: latlong(${details.lat ?: -0.0}, ${details.lon ?: 0.0})"
+      text = "Location: ${details.getLatLng()?.toString() ?: "Not Available"}"
     ),
     DetailItem(
       icon = Icons.Outlined.CalendarToday,
-      text = "Created at ${details.createdAt}"
+      text = "Created at ${details.getFormattedDate()}"
     ),
   ).forEach { item ->
     item {
@@ -301,16 +302,14 @@ private fun DetailItemListTile(item: DetailItem) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun StoryDetailScreenPreview() {
-  val state = StoryDetailsState
-    .initial()
-    .copy(
-      status = UiStatus.Success,
-      story = Story.dummy()
-    )
-
   DicodingStoriesTheme {
     StoryDetailScreen(
-      state = state,
+      state = StoryDetailsState
+        .initial()
+        .copy(
+          status = UiStatus.Success,
+          story = Story.dummy()
+        ),
       onBack = {}
     )
   }
@@ -319,13 +318,13 @@ private fun StoryDetailScreenPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun StoryDetailScreenErrorPreview() {
-  val state = StoryDetailsState
-    .initial()
-    .copy(status = UiStatus.Failure("UnknownException"))
-
   DicodingStoriesTheme {
     StoryDetailScreen(
-      state = state,
+      state = StoryDetailsState
+        .initial()
+        .copy(
+          status = UiStatus.Failure("UnknownException")
+        ),
       onBack = {}
     )
   }
@@ -334,11 +333,13 @@ private fun StoryDetailScreenErrorPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun StoryDetailScreenLoadingPreview() {
-  val state = StoryDetailsState.initial()
-
   DicodingStoriesTheme {
     StoryDetailScreen(
-      state = state,
+      state = StoryDetailsState
+        .initial()
+        .copy(
+          story = Story.dummy().copy(lat = null, lon = null)
+        ),
       onBack = {}
     )
   }

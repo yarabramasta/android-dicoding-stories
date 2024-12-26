@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.stories.R
@@ -30,6 +31,9 @@ import com.dicoding.stories.shared.ui.composables.ShimmerItem
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.setLocale
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +44,7 @@ fun HomeScreen(
   state: HomeState = HomeState.initial(),
   onStoryClick: (Story) -> Unit = {},
   onNavigateCreateStory: () -> Unit = {},
+  onNavigateStoriesLocations: () -> Unit = {},
 ) {
   val context = LocalContext.current
   val locale = LocalContext.current.resources.configuration.locales[0].language
@@ -137,12 +142,49 @@ fun HomeScreen(
         if (state.stories.isEmpty()) {
           buildEmptyStories()
         } else {
+          buildStoriesLocationsButton(
+            state = state,
+            onNavigateStoriesLocations = onNavigateStoriesLocations
+          )
           buildStories(
             status = state.status,
             stories = state.stories,
             onStoryClick = onStoryClick
           )
         }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+private fun LazyListScope.buildStoriesLocationsButton(
+  state: HomeState,
+  onNavigateStoriesLocations: () -> Unit,
+) {
+  item {
+    val locationPermissionState = rememberPermissionState(
+      permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    val hasLocationPermission = locationPermissionState.status.isGranted
+
+    Box(
+      modifier = Modifier.padding(horizontal = 24.dp)
+    ) {
+      TextButton(
+        onClick = {
+          if (hasLocationPermission) {
+            onNavigateStoriesLocations()
+          } else {
+            locationPermissionState.launchPermissionRequest()
+          }
+        },
+        enabled = state.status is UiStatus.Success || state.status is UiStatus.Idle
+      ) {
+        Text(
+          text = stringResource(R.string.see_stories_locations),
+          textDecoration = TextDecoration.Underline
+        )
       }
     }
   }
