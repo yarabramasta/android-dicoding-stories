@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 import com.dicoding.stories.R
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
+import com.google.android.gms.maps.model.LatLng
 
 @Immutable
 data class CreateStoryState(
@@ -15,6 +16,7 @@ data class CreateStoryState(
   val imageBitmap: Bitmap?,
   val description: String,
   val descriptionError: UiText?,
+  val latLng: LatLng?,
 ) {
   companion object {
     fun initial() = CreateStoryState(
@@ -24,6 +26,7 @@ data class CreateStoryState(
       imageBitmap = null,
       description = "",
       descriptionError = null,
+      latLng = null
     )
   }
 

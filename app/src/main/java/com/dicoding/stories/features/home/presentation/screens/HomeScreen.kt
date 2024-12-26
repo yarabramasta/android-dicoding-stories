@@ -32,8 +32,7 @@ import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.setLocale
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,10 +162,17 @@ private fun LazyListScope.buildStoriesLocationsButton(
   onNavigateStoriesLocations: () -> Unit,
 ) {
   item {
-    val locationPermissionState = rememberPermissionState(
-      permission = android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
-    val hasLocationPermission = locationPermissionState.status.isGranted
+    val locationPermissionState = rememberMultiplePermissionsState(
+      permissions = listOf(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+      )
+    ) { map ->
+      if (map.all { it.value }) {
+        onNavigateStoriesLocations()
+      }
+    }
+    val hasLocationPermission = locationPermissionState.allPermissionsGranted
 
     Box(
       modifier = Modifier.padding(horizontal = 24.dp)
@@ -176,7 +182,7 @@ private fun LazyListScope.buildStoriesLocationsButton(
           if (hasLocationPermission) {
             onNavigateStoriesLocations()
           } else {
-            locationPermissionState.launchPermissionRequest()
+            locationPermissionState.launchMultiplePermissionRequest()
           }
         },
         enabled = state.status is UiStatus.Success || state.status is UiStatus.Idle

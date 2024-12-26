@@ -41,4 +41,10 @@
     <string name="pick_from_gallery">Ambil dari galeri</string>
     <string name="story_created_successfully">Selamat! story kamu berhasil diupload.</string>
     <string name="see_stories_locations">Lihat lokasi stories</string>
+    <string name="err_failed_to_get_location">Failed to get location: %1$s</string>
+    <string name="form_location_switch_not_enabled">Pelacakan lokasi tidak diaktifkan.</string>
+    <string name="form_location_switch_loading">Mendapatkan lokasi kamu…</string>
+    <string name="form_location_switch_success">Lokasi kamu: %1$s</string>
+    <string name="form_location_switch_label">Aktifkan pelacakan lokasi</string>
+    <string name="err_form_location_switch_need_location_service">Mohon untuk mengaktifkan servis GPS!</string>
 </resources>

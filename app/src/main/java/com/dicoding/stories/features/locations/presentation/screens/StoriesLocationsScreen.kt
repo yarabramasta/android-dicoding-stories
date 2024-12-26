@@ -3,6 +3,7 @@ package com.dicoding.stories.features.locations.presentation.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -71,65 +72,78 @@ fun StoriesLocationsScreen(
               contentDescription = "Back to home"
             )
           }
+        },
+        actions = {
+          TextButton(
+            onClick = onRefresh
+          ) {
+            Text("Refresh")
+          }
         }
       )
     }
   ) { innerPadding ->
-    AnimatedVisibility(
-      visible = state.status !is UiStatus.Success,
-      enter = fadeIn(),
-      exit = fadeOut()
+    PullToRefreshBox(
+      isRefreshing = state.isRefreshing,
+      onRefresh = onRefresh
     ) {
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(innerPadding)
-          .background(MaterialTheme.colorScheme.background)
-          .zIndex(1f),
-        contentAlignment = Alignment.Center
+      AnimatedVisibility(
+        visible = state.status !is UiStatus.Success,
+        enter = fadeIn(),
+        exit = fadeOut()
       ) {
-        when (state.status) {
-          is UiStatus.Loading -> CircularProgressIndicator()
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(MaterialTheme.colorScheme.background)
+            .zIndex(1f),
+          contentAlignment = Alignment.Center
+        ) {
+          when (state.status) {
+            is UiStatus.Loading -> CircularProgressIndicator()
 
-          is UiStatus.Failure -> {
-            Column(
-              modifier = Modifier.fillMaxSize(),
-              verticalArrangement = Arrangement.spacedBy(
-                16.dp,
-                alignment = Alignment.CenterVertically
-              ),
-              horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-              Icon(
-                imageVector = Icons.Outlined.Warning,
-                contentDescription = "Failed to load stories locations",
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.outline,
-              )
-              Text(
-                text =
-                when (state.status.message) {
-                  "UnknownException" -> "Exception: " + stringResource(R.string.err_general_trouble)
-                  "Unauthorized" -> "Exception: " + stringResource(R.string.err_unauthorized)
-                  else -> "Exception: ${state.status.message}"
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-                textAlign = TextAlign.Center
-              )
+            is UiStatus.Failure -> {
+              Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(
+                  16.dp,
+                  alignment = Alignment.CenterVertically
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                Icon(
+                  imageVector = Icons.Outlined.Warning,
+                  contentDescription = "Failed to load stories locations",
+                  modifier = Modifier.size(32.dp),
+                  tint = MaterialTheme.colorScheme.outline,
+                )
+                Text(
+                  text =
+                  when (state.status.message) {
+                    "UnknownException" -> "Exception: " + stringResource(R.string.err_general_trouble)
+                    "Unauthorized" -> "Exception: " + stringResource(R.string.err_unauthorized)
+                    else -> "Exception: ${state.status.message}"
+                  },
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.outline,
+                  textAlign = TextAlign.Center
+                )
+                OutlinedButton(
+                  onClick = onRefresh,
+                  border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                ) {
+                  Text("Refresh", color = MaterialTheme.colorScheme.outline)
+                }
+              }
             }
-          }
 
-          else -> Box {}
+            else -> Box {}
+          }
         }
       }
-    }
 
-    if (state.stories.isNotEmpty()) {
-      PullToRefreshBox(
-        isRefreshing = state.isRefreshing,
-        onRefresh = onRefresh
-      ) {
+      if (state.status is UiStatus.Success || state.status is UiStatus.Idle) {
         Box(
           modifier = Modifier
             .fillMaxSize()

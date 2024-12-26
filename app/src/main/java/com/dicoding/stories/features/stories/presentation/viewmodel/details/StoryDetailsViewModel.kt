@@ -36,7 +36,7 @@ class StoryDetailsViewModel @Inject constructor(
     intent {
       reduce { state.copy(status = UiStatus.Loading, isRefreshing = true) }
       fetch(state.story?.id ?: "")
-      reduce { state.copy(isRefreshing = false) }
+      reduce { state.copy(status = UiStatus.Success, isRefreshing = false) }
     }
   }
 

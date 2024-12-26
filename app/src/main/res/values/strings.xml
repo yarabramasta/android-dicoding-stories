@@ -41,4 +41,10 @@
     <string name="pick_from_gallery">Pick from gallery</string>
     <string name="story_created_successfully">Congrats! your story successfully uploaded.</string>
     <string name="see_stories_locations">See stories locations</string>
+    <string name="err_failed_to_get_location">Failed to get location: %1$s</string>
+    <string name="form_location_switch_not_enabled">Location tracking is not enabled.</string>
+    <string name="form_location_switch_loading">Getting your location…</string>
+    <string name="form_location_switch_success">Your location: %1$s</string>
+    <string name="form_location_switch_label">Enable Location Tracking</string>
+    <string name="err_form_location_switch_need_location_service">Please activate GPS service!</string>
 </resources>

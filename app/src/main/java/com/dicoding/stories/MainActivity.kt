@@ -291,6 +291,7 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       state = state,
       onImageUriChanged = viewModel::onImageUriChanged,
       onDescriptionChanged = viewModel::onDescriptionChanged,
+      onLocationChanged = viewModel::onLatLngChanged,
       onBack = {
         navController.popBackStack()
       },

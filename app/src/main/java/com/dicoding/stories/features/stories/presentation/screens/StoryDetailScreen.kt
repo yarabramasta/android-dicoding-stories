@@ -1,6 +1,6 @@
 package com.dicoding.stories.features.stories.presentation.screens
 
-import androidx.activity.compose.BackHandler
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,12 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil3.compose.SubcomposeAsyncImage
 import com.dicoding.stories.R
+import com.dicoding.stories.features.locations.helper.LocationUtil
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.viewmodel.details.StoryDetailsState
 import com.dicoding.stories.shared.ui.composables.ShimmerBox
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
-import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +54,9 @@ fun StoryDetailScreen(
   onRefresh: () -> Unit = {},
   onBack: () -> Unit,
 ) {
-  BackHandler(enabled = true) { onBack() }
+//  BackHandler(enabled = true) { onBack() }
+
+  val context = LocalContext.current
 
   val details = state.story ?: Story.placeholder()
 
@@ -170,7 +173,7 @@ fun StoryDetailScreen(
             }
           }
 
-          else -> buildStoryDetails(details)
+          else -> buildStoryDetails(context, details)
         }
       }
     }
@@ -233,7 +236,7 @@ private fun LazyListScope.buildHeroImage(
   }
 }
 
-private fun LazyListScope.buildStoryDetails(details: Story) {
+private fun LazyListScope.buildStoryDetails(context: Context, details: Story) {
   item {
     Text(
       text = stringResource(R.string.story_uploaded_by, details.name),
@@ -254,21 +257,27 @@ private fun LazyListScope.buildStoryDetails(details: Story) {
         .padding(bottom = 8.dp)
     )
   }
-  listOf(
-    DetailItem(
-      icon = Icons.Outlined.Fingerprint,
-      text = "ID - ${details.id}"
-    ),
-    DetailItem(
-      icon = Icons.Outlined.LocationOn,
-      text = "Location: ${details.getLatLng()?.toString() ?: "Not Available"}"
-    ),
-    DetailItem(
-      icon = Icons.Outlined.CalendarToday,
-      text = "Created at ${details.getFormattedDate()}"
-    ),
-  ).forEach { item ->
-    item {
+  item {
+    val location = if (details.lat != null && details.lon != null) {
+      LocationUtil.getReadableLocation(context, details.lat, details.lon)
+    } else {
+      null
+    }
+
+    listOf(
+      DetailItem(
+        icon = Icons.Outlined.Fingerprint,
+        text = "ID - ${details.id}"
+      ),
+      DetailItem(
+        icon = Icons.Outlined.LocationOn,
+        text = "Location: ${location ?: "Not Available"}"
+      ),
+      DetailItem(
+        icon = Icons.Outlined.CalendarToday,
+        text = "Created at ${details.getFormattedDate()}"
+      ),
+    ).forEach { item ->
       DetailItemListTile(item)
     }
   }
@@ -283,7 +292,9 @@ private data class DetailItem(
 private fun DetailItemListTile(item: DetailItem) {
   Row(
     horizontalArrangement = Arrangement.spacedBy(8.dp),
-    modifier = Modifier.padding(horizontal = 24.dp)
+    modifier = Modifier
+      .padding(horizontal = 24.dp)
+      .padding(bottom = 8.dp)
   ) {
     Icon(
       imageVector = item.icon,

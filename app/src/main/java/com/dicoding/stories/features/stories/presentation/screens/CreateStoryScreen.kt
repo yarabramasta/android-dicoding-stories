@@ -3,11 +3,13 @@
 package com.dicoding.stories.features.stories.presentation.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -27,6 +29,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -53,6 +56,7 @@ import com.composables.core.SheetDetent.Companion.FullyExpanded
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.dicoding.stories.BuildConfig
 import com.dicoding.stories.R
+import com.dicoding.stories.features.locations.helper.LocationUtil
 import com.dicoding.stories.features.stories.presentation.viewmodel.create.CreateStoryState
 import com.dicoding.stories.shared.ui.composables.EditText
 import com.dicoding.stories.shared.ui.composables.ShimmerBox
@@ -62,6 +66,11 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -69,9 +78,10 @@ fun CreateStoryScreen(
   state: CreateStoryState,
   onDescriptionChanged: (String) -> Unit = {},
   onImageUriChanged: (Uri?, Bitmap?) -> Unit = { uri, bitmap -> },
-  onBack: () -> Unit = {},
+  onLocationChanged: (LatLng?) -> Unit = {},
   onUpload: (Context) -> Unit = {},
   onClear: () -> Unit = {},
+  onBack: () -> Unit = {},
 ) {
   val isKeyboardOpen by keyboardAsState()
   BackHandler(enabled = !isKeyboardOpen) { onBack() }
@@ -199,6 +209,7 @@ fun CreateStoryScreen(
       },
       onDescriptionChanged = onDescriptionChanged,
       onImageUriChanged = onImageUriChanged,
+      onLocationChanged = onLocationChanged
     )
   }
 }
@@ -370,6 +381,7 @@ private fun CreateStoryScreenContent(
   onImagePickerCardClick: () -> Unit = {},
   onDescriptionChanged: (String) -> Unit = {},
   onImageUriChanged: (Uri?, Bitmap?) -> Unit = { uri, bitmap -> },
+  onLocationChanged: (LatLng?) -> Unit = {},
 ) {
   LazyColumn(
     modifier = modifier.fillMaxSize(),
@@ -478,6 +490,15 @@ private fun CreateStoryScreenContent(
       }
     }
     item {
+      LocationTrackingSwitch(
+        state = state,
+        onLocationChanged = { location ->
+          Log.d("CreateStoryScreen", "User Location: $location")
+          onLocationChanged(location)
+        }
+      )
+    }
+    item {
       val keyboardController = LocalSoftwareKeyboardController.current
       EditText(
         label = stringResource(R.string.form_label_description),
@@ -495,6 +516,134 @@ private fun CreateStoryScreenContent(
           keyboardType = KeyboardType.Text,
           imeAction = ImeAction.Done
         ),
+      )
+    }
+  }
+}
+
+lateinit var locationCallback: LocationCallback
+lateinit var locationProvider: FusedLocationProviderClient
+
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun LocationTrackingSwitch(
+  state: CreateStoryState,
+  onLocationChanged: (LatLng) -> Unit = {},
+) {
+  val context = LocalContext.current
+
+  locationProvider = LocationServices.getFusedLocationProviderClient(context)
+
+  val locationPermissionState = rememberMultiplePermissionsState(
+    permissions = listOf(
+      Manifest.permission.ACCESS_FINE_LOCATION,
+      Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+  )
+  val hasLocationPermission = locationPermissionState.allPermissionsGranted
+
+  var currentUserLocation by remember { mutableStateOf<LatLng?>(null) }
+  var enabled by remember { mutableStateOf(false) }
+
+  val address = currentUserLocation?.let {
+    LocationUtil.getReadableLocation(context, it.latitude, it.longitude)
+  }
+
+  DisposableEffect(key1 = locationProvider) {
+    locationCallback = object : LocationCallback() {
+      override fun onLocationResult(result: LocationResult) {
+        locationProvider.lastLocation
+          .addOnSuccessListener { location ->
+            Log.d("CreateStoryScreen", "User Location: $location")
+            location?.let {
+              currentUserLocation = LatLng(it.latitude, it.longitude)
+              onLocationChanged(currentUserLocation!!)
+            }
+          }
+          .addOnFailureListener { exception ->
+            context.showToast(
+              context.getString(
+                R.string.err_failed_to_get_location,
+                exception.message ?: "Unknown"
+              )
+            )
+          }
+      }
+    }
+
+    if (hasLocationPermission) {
+      if (enabled) {
+        LocationUtil.locationUpdate(
+          provider = locationProvider,
+          callback = locationCallback,
+        )
+      }
+    } else {
+      locationPermissionState.launchMultiplePermissionRequest()
+    }
+
+    onDispose {
+      LocationUtil.stopLocationUpdate(
+        provider = locationProvider,
+        callback = locationCallback,
+      )
+    }
+  }
+
+  Column(
+    modifier = Modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(
+        text = stringResource(R.string.form_location_switch_label),
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.SemiBold
+      )
+      Switch(
+        checked = enabled,
+        onCheckedChange = {
+
+          if (LocationUtil.locationServiceIsActive(context)) {
+            enabled = it
+          } else {
+            context.showToast(
+              context.getString(
+                R.string.err_form_location_switch_need_location_service
+              )
+            )
+          }
+        },
+        enabled = state.status !is UiStatus.Loading,
+      )
+    }
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      Icon(
+        imageVector = Icons.Outlined.LocationOn,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.outline,
+        modifier = Modifier.size(16.dp)
+      )
+      Text(
+        text = when {
+          !enabled -> stringResource(R.string.form_location_switch_not_enabled)
+          address == null -> stringResource(R.string.form_location_switch_loading)
+          else -> stringResource(
+            R.string.form_location_switch_success,
+            address
+          )
+        },
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.outline
       )
     }
   }
