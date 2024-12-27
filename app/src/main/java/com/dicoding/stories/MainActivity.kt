@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.dicoding.stories.features.auth.presentation.screens.OnboardingScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignInScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignUpScreen
@@ -27,8 +28,7 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOut
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.features.home.presentation.screens.HomeScreen
-import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
-import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
+import com.dicoding.stories.features.home.presentation.viewmodel.HomePagingViewModel
 import com.dicoding.stories.features.locations.presentation.screens.StoriesLocationsScreen
 import com.dicoding.stories.features.locations.presentation.viewmodel.StoriesLocationsViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
@@ -186,8 +186,8 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
     val signOutViewModel = hiltViewModel<SignOutViewModel>()
     val signOutState by signOutViewModel.collectAsState()
 
-    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
-    val homeState by homeViewModel.collectAsState()
+    val homeViewModel = it.scopedViewModel<HomePagingViewModel>(navController)
+    val stories = homeViewModel.storiesPagingDataFlow.collectAsLazyPagingItems()
 
     signOutViewModel.collectSideEffect { effect ->
       when (effect) {
@@ -203,18 +203,12 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
       }
     }
 
-    homeViewModel.collectSideEffect { effect ->
-      when (effect) {
-        is HomeSideEffect.OnStoryClickNavigate -> {
-          navController.navigate(AppRoutes.DetailStory(effect.story))
-        }
-      }
-    }
-
     HomeScreen(
-      state = homeState,
-      onRefresh = homeViewModel::refresh,
-      onStoryClick = homeViewModel::onStoryClick,
+      stories = stories,
+      onRefresh = stories::refresh,
+      onStoryClick = {
+        navController.navigate(AppRoutes.DetailStory(it))
+      },
       signOutState = signOutState,
       onSignOut = {
         signOutViewModel.signOut(context) {
@@ -273,7 +267,8 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
     val viewModel = hiltViewModel<CreateStoryViewModel>()
     val state by viewModel.collectAsState()
 
-    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+    val homeViewModel = it.scopedViewModel<HomePagingViewModel>(navController)
+    val stories = homeViewModel.storiesPagingDataFlow.collectAsLazyPagingItems()
 
     viewModel.collectSideEffect { effect ->
       when (effect) {
@@ -297,7 +292,7 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       },
       onUpload = { uploadContext ->
         viewModel.onSubmit(uploadContext) {
-          homeViewModel.refresh()
+          stories.refresh()
         }
       },
       onClear = viewModel::onClear,

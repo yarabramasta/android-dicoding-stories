@@ -47,4 +47,5 @@
     <string name="form_location_switch_success">Your location: %1$s</string>
     <string name="form_location_switch_label">Enable Location Tracking</string>
     <string name="err_form_location_switch_need_location_service">Please activate GPS service!</string>
+    <string name="err_home_paging_end_of_pagination">You have reached the end of the list.</string>
 </resources>

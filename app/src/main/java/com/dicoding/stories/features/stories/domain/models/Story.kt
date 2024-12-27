@@ -1,6 +1,7 @@
 package com.dicoding.stories.features.stories.domain.models
 
 import android.os.Parcelable
+import com.dicoding.stories.features.stories.data.local.StoryEntity
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -70,4 +71,14 @@ data class Story(
         }
       )
   }
+
+  fun toEntity(): StoryEntity = StoryEntity(
+    id = id,
+    name = name,
+    description = description,
+    photoUrl = photoUrl,
+    createdAt = createdAt,
+    lat = lat,
+    lon = lon,
+  )
 }
