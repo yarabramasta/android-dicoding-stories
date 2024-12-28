@@ -83,9 +83,7 @@ dependencies {
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.androidx.material3)
   implementation(libs.play.services.location)
-  implementation(libs.androidx.junit.ktx)
   androidTestImplementation(platform(libs.androidx.compose.bom))
-  androidTestImplementation(libs.androidx.ui.test.junit4)
   debugImplementation(libs.androidx.ui.tooling)
   debugImplementation(libs.androidx.ui.test.manifest)
   //  additional jdk core lib
@@ -100,10 +98,15 @@ dependencies {
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.work.runtime.ktx)
   //  testing libraries
+  testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
+  androidTestImplementation(libs.androidx.ui.test.junit4)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockito.core)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
   //  additional kotlinx libs
   implementation(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.datetime)
@@ -144,5 +147,6 @@ dependencies {
   //  paging 3
   implementation(libs.androidx.paging.runtime)
   implementation(libs.androidx.paging.compose)
-  testImplementation(libs.androidx.paging.common)
+  implementation(libs.androidx.paging.common)
+  testImplementation(libs.androidx.paging.testing)
 }

@@ -28,7 +28,7 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOut
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.features.home.presentation.screens.HomeScreen
-import com.dicoding.stories.features.home.presentation.viewmodel.HomePagingViewModel
+import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
 import com.dicoding.stories.features.locations.presentation.screens.StoriesLocationsScreen
 import com.dicoding.stories.features.locations.presentation.viewmodel.StoriesLocationsViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
@@ -186,8 +186,8 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
     val signOutViewModel = hiltViewModel<SignOutViewModel>()
     val signOutState by signOutViewModel.collectAsState()
 
-    val homeViewModel = it.scopedViewModel<HomePagingViewModel>(navController)
-    val stories = homeViewModel.storiesPagingDataFlow.collectAsLazyPagingItems()
+    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+    val stories = homeViewModel.storiesPaging.collectAsLazyPagingItems()
 
     signOutViewModel.collectSideEffect { effect ->
       when (effect) {
@@ -267,8 +267,8 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
     val viewModel = hiltViewModel<CreateStoryViewModel>()
     val state by viewModel.collectAsState()
 
-    val homeViewModel = it.scopedViewModel<HomePagingViewModel>(navController)
-    val stories = homeViewModel.storiesPagingDataFlow.collectAsLazyPagingItems()
+    val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+    val stories = homeViewModel.storiesPaging.collectAsLazyPagingItems()
 
     viewModel.collectSideEffect { effect ->
       when (effect) {
