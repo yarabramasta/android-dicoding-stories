@@ -27,4 +27,12 @@ interface StoriesService {
   suspend fun getStoryDetails(
     @Path("id") id: String,
   ): ApiResponse<GetStoryDetailResponse>
+
+  @GET("stories")
+  suspend fun getStoriesWithExplicitHeader(
+    @Header("Authorization") token: String,
+    @Query("page") page: Int = 0,
+    @Query("limit") size: Int = 10,
+    @Query("location") location: Int = 0,
+  ): ApiResponse<GetStoriesResponse>
 }

@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.dicoding.stories.features.auth.presentation.screens.OnboardingScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignInScreen
 import com.dicoding.stories.features.auth.presentation.screens.SignUpScreen
@@ -27,8 +28,9 @@ import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOut
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpSideEffect
 import com.dicoding.stories.features.auth.presentation.viewmodel.signup.SignUpViewModel
 import com.dicoding.stories.features.home.presentation.screens.HomeScreen
-import com.dicoding.stories.features.home.presentation.viewmodel.HomeSideEffect
 import com.dicoding.stories.features.home.presentation.viewmodel.HomeViewModel
+import com.dicoding.stories.features.locations.presentation.screens.StoriesLocationsScreen
+import com.dicoding.stories.features.locations.presentation.viewmodel.StoriesLocationsViewModel
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.screens.CreateStoryScreen
 import com.dicoding.stories.features.stories.presentation.screens.StoryDetailScreen
@@ -78,6 +80,7 @@ class MainActivity : AppCompatActivity() {
 
           navigation<AppRoutes.Main>(startDestination = AppRoutes.Home) {
             addHome(navController = navController)
+            addStoriesLocations(navController = navController)
             addStoryDetail(navController = navController)
             addCreateStory(navController = navController)
           }
@@ -184,7 +187,7 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
     val signOutState by signOutViewModel.collectAsState()
 
     val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
-    val homeState by homeViewModel.collectAsState()
+    val stories = homeViewModel.storiesPaging.collectAsLazyPagingItems()
 
     signOutViewModel.collectSideEffect { effect ->
       when (effect) {
@@ -200,26 +203,38 @@ private fun NavGraphBuilder.addHome(navController: NavHostController) {
       }
     }
 
-    homeViewModel.collectSideEffect { effect ->
-      when (effect) {
-        is HomeSideEffect.OnStoryClickNavigate -> {
-          navController.navigate(AppRoutes.DetailStory(effect.story))
-        }
-      }
-    }
-
     HomeScreen(
-      state = homeState,
-      onRefresh = homeViewModel::refresh,
-      onStoryClick = homeViewModel::onStoryClick,
+      stories = stories,
+      onRefresh = stories::refresh,
+      onStoryClick = {
+        navController.navigate(AppRoutes.DetailStory(it))
+      },
       signOutState = signOutState,
       onSignOut = {
         signOutViewModel.signOut(context) {
           authViewModel.set(null)
         }
       },
+      onNavigateStoriesLocations = {
+        navController.navigate(AppRoutes.StoriesLocations)
+      },
       onNavigateCreateStory = {
         navController.navigate(AppRoutes.CreateStory)
+      }
+    )
+  }
+}
+
+private fun NavGraphBuilder.addStoriesLocations(navController: NavHostController) {
+  composable<AppRoutes.StoriesLocations> {
+    val viewModel = hiltViewModel<StoriesLocationsViewModel>()
+    val state by viewModel.collectAsState()
+
+    StoriesLocationsScreen(
+      state = state,
+      onRefresh = viewModel::refresh,
+      onBack = {
+        navController.popBackStack()
       }
     )
   }
@@ -253,6 +268,7 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
     val state by viewModel.collectAsState()
 
     val homeViewModel = it.scopedViewModel<HomeViewModel>(navController)
+    val stories = homeViewModel.storiesPaging.collectAsLazyPagingItems()
 
     viewModel.collectSideEffect { effect ->
       when (effect) {
@@ -270,12 +286,13 @@ private fun NavGraphBuilder.addCreateStory(navController: NavHostController) {
       state = state,
       onImageUriChanged = viewModel::onImageUriChanged,
       onDescriptionChanged = viewModel::onDescriptionChanged,
+      onLocationChanged = viewModel::onLatLngChanged,
       onBack = {
         navController.popBackStack()
       },
       onUpload = { uploadContext ->
         viewModel.onSubmit(uploadContext) {
-          homeViewModel.refresh()
+          stories.refresh()
         }
       },
       onClear = viewModel::onClear,

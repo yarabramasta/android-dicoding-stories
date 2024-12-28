@@ -40,6 +40,7 @@ android {
     }
 
     loadConfig("String", "DICODING_EVENTS_API_BASE_URL", "")
+    loadConfig("String", "MAPS_API_KEY", "")
 
     resourceConfigurations.plus(listOf("en", "in"))
   }
@@ -81,11 +82,8 @@ dependencies {
   implementation(libs.androidx.ui.graphics)
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.androidx.material3)
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.androidx.junit)
-  androidTestImplementation(libs.androidx.espresso.core)
+  implementation(libs.play.services.location)
   androidTestImplementation(platform(libs.androidx.compose.bom))
-  androidTestImplementation(libs.androidx.ui.test.junit4)
   debugImplementation(libs.androidx.ui.tooling)
   debugImplementation(libs.androidx.ui.test.manifest)
   //  additional jdk core lib
@@ -98,10 +96,17 @@ dependencies {
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.appcompat.resources)
   implementation(libs.androidx.datastore.preferences)
-  implementation(libs.androidx.room.runtime)
-  ksp(libs.androidx.room.compiler)
-  implementation(libs.androidx.room)
   implementation(libs.androidx.work.runtime.ktx)
+  //  testing libraries
+  testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
+  androidTestImplementation(libs.androidx.ui.test.junit4)
+  testImplementation(libs.junit)
+  androidTestImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.espresso.core)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockito.core)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
   //  additional kotlinx libs
   implementation(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.datetime)
@@ -132,4 +137,16 @@ dependencies {
   implementation(libs.accompanist.permission)
   //  compose unstyled
   implementation(libs.compose.unstyled)
+  //  google maps
+  implementation(libs.google.maps)
+  //  room database
+  implementation(libs.androidx.room.runtime)
+  ksp(libs.androidx.room.compiler)
+  implementation(libs.androidx.room)
+  implementation(libs.androidx.room.paging)
+  //  paging 3
+  implementation(libs.androidx.paging.runtime)
+  implementation(libs.androidx.paging.compose)
+  implementation(libs.androidx.paging.common)
+  testImplementation(libs.androidx.paging.testing)
 }

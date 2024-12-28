@@ -1,6 +1,14 @@
 package com.dicoding.stories.features.stories.domain.models
 
 import android.os.Parcelable
+import com.dicoding.stories.features.stories.data.local.StoryEntity
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
@@ -35,5 +43,42 @@ data class Story(
       photoUrl = "",
       createdAt = "..."
     )
+
   }
+
+  fun getLatLng(): LatLng? {
+    return if (lat != null && lon != null) {
+      LatLng(lat, lon)
+    } else {
+      null
+    }
+  }
+
+  fun getFormattedDate(): String {
+    return Instant
+      .parse(createdAt)
+      .format(
+        DateTimeComponents.Format {
+          date(
+            LocalDate.Format {
+              monthName(MonthNames.ENGLISH_ABBREVIATED)
+              char(' ')
+              dayOfMonth()
+              chars(", ")
+              year()
+            }
+          )
+        }
+      )
+  }
+
+  fun toEntity(): StoryEntity = StoryEntity(
+    id = id,
+    name = name,
+    description = description,
+    photoUrl = photoUrl,
+    createdAt = createdAt,
+    lat = lat,
+    lon = lon,
+  )
 }

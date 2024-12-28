@@ -10,6 +10,7 @@ import com.dicoding.stories.features.stories.domain.business.CreateStoryUseCase
 import com.dicoding.stories.shared.ui.lib.ImageUtils
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.UiText
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
@@ -47,6 +48,12 @@ class CreateStoryViewModel @Inject constructor(
           descriptionError = state.validateDescription(text)
         )
       }
+    }
+  }
+
+  fun onLatLngChanged(latLng: LatLng?) {
+    intent {
+      reduce { state.copy(latLng = latLng) }
     }
   }
 
@@ -90,7 +97,9 @@ class CreateStoryViewModel @Inject constructor(
             createStoryUseCase(
               CreateStoryUseCase.Params(
                 image = file,
-                description = state.description
+                description = state.description,
+                lat = state.latLng?.latitude,
+                lon = state.latLng?.longitude
               )
             )
               .fold(

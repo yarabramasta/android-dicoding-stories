@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Edit
@@ -19,17 +20,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.dicoding.stories.R
 import com.dicoding.stories.features.auth.presentation.viewmodel.signout.SignOutState
-import com.dicoding.stories.features.home.presentation.viewmodel.HomeState
 import com.dicoding.stories.features.stories.domain.models.Story
 import com.dicoding.stories.features.stories.presentation.atoms.StoryListItem
 import com.dicoding.stories.shared.ui.composables.ShimmerItem
 import com.dicoding.stories.shared.ui.lib.UiStatus
 import com.dicoding.stories.shared.ui.lib.setLocale
 import com.dicoding.stories.shared.ui.theme.DicodingStoriesTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,15 +46,16 @@ fun HomeScreen(
   signOutState: SignOutState = SignOutState.initial(),
   onSignOut: () -> Unit = {},
   onRefresh: () -> Unit = {},
-  state: HomeState = HomeState.initial(),
+  stories: LazyPagingItems<Story>,
   onStoryClick: (Story) -> Unit = {},
   onNavigateCreateStory: () -> Unit = {},
+  onNavigateStoriesLocations: () -> Unit = {},
 ) {
   val context = LocalContext.current
   val locale = LocalContext.current.resources.configuration.locales[0].language
 
   PullToRefreshBox(
-    isRefreshing = state.isRefreshing,
+    isRefreshing = stories.loadState.refresh == LoadState.Loading,
     onRefresh = onRefresh,
   ) {
     Scaffold(
@@ -134,15 +144,58 @@ fun HomeScreen(
             modifier = Modifier.padding(horizontal = 24.dp),
           )
         }
-        if (state.stories.isEmpty()) {
+        if (stories.itemCount == 0) {
           buildEmptyStories()
         } else {
+          buildStoriesLocationsButton(
+            loading = stories.loadState.refresh == LoadState.Loading,
+            onNavigateStoriesLocations = onNavigateStoriesLocations
+          )
           buildStories(
-            status = state.status,
-            stories = state.stories,
+            stories = stories,
             onStoryClick = onStoryClick
           )
         }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+private fun LazyListScope.buildStoriesLocationsButton(
+  loading: Boolean,
+  onNavigateStoriesLocations: () -> Unit,
+) {
+  item {
+    val locationPermissionState = rememberMultiplePermissionsState(
+      permissions = listOf(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+      )
+    ) { map ->
+      if (map.all { it.value }) {
+        onNavigateStoriesLocations()
+      }
+    }
+    val hasLocationPermission = locationPermissionState.allPermissionsGranted
+
+    Box(
+      modifier = Modifier.padding(horizontal = 24.dp)
+    ) {
+      TextButton(
+        onClick = {
+          if (hasLocationPermission) {
+            onNavigateStoriesLocations()
+          } else {
+            locationPermissionState.launchMultiplePermissionRequest()
+          }
+        },
+        enabled = !loading
+      ) {
+        Text(
+          text = stringResource(R.string.see_stories_locations),
+          textDecoration = TextDecoration.Underline
+        )
       }
     }
   }
@@ -175,12 +228,12 @@ private fun LazyListScope.buildEmptyStories() {
 }
 
 private fun LazyListScope.buildStories(
-  status: UiStatus,
-  stories: List<Story>,
+  stories: LazyPagingItems<Story>,
   onStoryClick: (Story) -> Unit,
 ) {
-  if (status is UiStatus.Failure) {
-    item {
+  item {
+    if (stories.loadState.refresh is LoadState.Error) {
+      val error = (stories.loadState.refresh as LoadState.Error).error
       Column(
         modifier = Modifier
           .fillMaxWidth()
@@ -201,11 +254,7 @@ private fun LazyListScope.buildStories(
           textAlign = TextAlign.Center
         )
         Text(
-          text =
-          when (status.message) {
-            "UnknownException" -> "Exception: " + stringResource(R.string.err_general_trouble)
-            else -> "Exception: ${status.message}"
-          },
+          text = "Exception: ${error.message}",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.outline,
           textAlign = TextAlign.Center
@@ -214,29 +263,86 @@ private fun LazyListScope.buildStories(
     }
   }
 
-  items(stories.size,
-    key = { index -> stories[index].id }
-  ) { index ->
-    when (status) {
-      is UiStatus.Loading -> {
+  when (stories.loadState.refresh) {
+    LoadState.Loading -> {
+      items(List(5) { Story.dummy() }) {
         ShimmerItem(
           modifier = Modifier.padding(horizontal = 8.dp)
         )
       }
+    }
 
-      is UiStatus.Failure -> {
+    is LoadState.Error -> {
+      items(List(5) { Story.dummy() }) {
         ShimmerItem(
           animate = false,
           modifier = Modifier.padding(horizontal = 8.dp),
         )
       }
+    }
 
-      else -> {
+    else -> {
+      items(
+        count = stories.itemCount,
+        key = stories.itemKey { it.id }
+      ) { index ->
         val story = stories[index]
-        StoryListItem(
-          story = story,
-          onClick = { onStoryClick(story) },
-          modifier = Modifier.padding(horizontal = 8.dp),
+        if (story != null) {
+          StoryListItem(
+            story = story,
+            onClick = { onStoryClick(story) },
+            modifier = Modifier.padding(horizontal = 8.dp),
+          )
+        }
+      }
+    }
+  }
+
+  item {
+    if (stories.loadState.append == LoadState.Loading) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        CircularProgressIndicator()
+      }
+    }
+    if (stories.loadState.append.endOfPaginationReached) {
+      Text(
+        text = stringResource(R.string.err_home_paging_end_of_pagination),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp)
+      )
+    }
+    if (stories.loadState.append is LoadState.Error) {
+      val error = (stories.loadState.append as LoadState.Error).error
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(
+          8.dp,
+          alignment = Alignment.CenterHorizontally
+        ),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Icon(
+          imageVector = Icons.Outlined.Warning,
+          contentDescription = "Failed to load stories",
+          modifier = Modifier.size(32.dp),
+          tint = MaterialTheme.colorScheme.outline,
+        )
+        Text(
+          text = "Exception: ${error.message}",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.outline,
+          textAlign = TextAlign.Center
         )
       }
     }
@@ -246,45 +352,23 @@ private fun LazyListScope.buildStories(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenPreview() {
+  val data = PagingData.from(List(5) { Story.dummy() })
+  val flow = MutableStateFlow(data)
+  val stories = flow.collectAsLazyPagingItems()
+
   DicodingStoriesTheme {
-    HomeScreen(
-      state = HomeState.initial()
-        .copy(status = UiStatus.Success),
-    )
+    HomeScreen(stories = stories)
   }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenEmptyStoriesPreview() {
-  DicodingStoriesTheme {
-    HomeScreen(
-      state = HomeState.initial().copy(
-        status = UiStatus.Success,
-        stories = emptyList()
-      ),
-    )
-  }
-}
+  val data = PagingData.from(emptyList<Story>())
+  val flow = MutableStateFlow(data)
+  val stories = flow.collectAsLazyPagingItems()
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun HomeScreenLoadingPreview() {
   DicodingStoriesTheme {
-    HomeScreen(
-      state = HomeState.initial()
-        .copy(status = UiStatus.Loading),
-    )
-  }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun HomeScreenFailurePreview() {
-  DicodingStoriesTheme {
-    HomeScreen(
-      state = HomeState.initial()
-        .copy(status = UiStatus.Failure("UnknownException")),
-    )
+    HomeScreen(stories = stories)
   }
 }

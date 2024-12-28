@@ -18,6 +18,9 @@ sealed class AppRoutes {
   data object Main : AppRoutes()
 
   @Serializable
+  data object StoriesLocations : AppRoutes()
+
+  @Serializable
   data object Home : AppRoutes()
 
   @Serializable
