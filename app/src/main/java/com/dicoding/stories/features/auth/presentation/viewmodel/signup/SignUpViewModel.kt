@@ -64,62 +64,60 @@ class SignUpViewModel @Inject constructor(
 
   fun onSubmit(context: Context) {
     intent {
-      if (state.formState.emailError == null && state.formState.passwordError == null) {
-        reduce { state.copy(status = UiStatus.Loading) }
+      reduce { state.copy(status = UiStatus.Loading) }
 
-        val params = SignUpUseCase.Params(
-          name = state.formState.name,
-          email = state.formState.email,
-          password = state.formState.password
-        )
+      val params = SignUpUseCase.Params(
+        name = state.formState.name,
+        email = state.formState.email,
+        password = state.formState.password
+      )
 
-        container.scope.launch {
-          signUpUseCase(params)
-            .fold(
-              onSuccess = {
-                reduce {
-                  state.copy(
-                    status = UiStatus.Success,
-                    formState = SignUpFormState.initial()
-                  )
-                }
+      container.scope.launch {
+        signUpUseCase(params)
+          .fold(
+            onSuccess = {
+              reduce {
+                state.copy(
+                  status = UiStatus.Success,
+                  formState = SignUpFormState.initial()
+                )
+              }
 
-                postSideEffect(SignUpSideEffect.OnSubmitSuccessNavigate)
-                postSideEffect(
-                  SignUpSideEffect.ShowToast(
-                    UiText.StringResource(R.string.sign_up_success)
-                      .asString(context)
+              postSideEffect(SignUpSideEffect.OnSubmitSuccessNavigate)
+              postSideEffect(
+                SignUpSideEffect.ShowToast(
+                  UiText.StringResource(R.string.sign_up_success)
+                    .asString(context)
+                )
+              )
+            },
+            onFailure = {
+              val message: String = when (it.message) {
+                "DuplicatedCredential" -> UiText.StringResource(
+                  R.string.err_duplicated_credentials
+                ).asString(context)
+
+                "BadRequestSignUp" -> UiText.StringResource(
+                  R.string.err_bad_req_sign_up
+                ).asString(context)
+
+                else -> UiText.StringResource(R.string.err_signup_trouble)
+                  .asString(context)
+              }
+
+              reduce {
+                state.copy(
+                  status = UiStatus.Failure(message),
+                  formState = state.formState.copy(
+                    emailError = state.formState.validateEmail(state.formState.email),
+                    passwordError = state.formState.validatePassword(state.formState.password)
                   )
                 )
-              },
-              onFailure = {
-                val message: String = when (it.message) {
-                  "DuplicatedCredential" -> UiText.StringResource(
-                    R.string.err_duplicated_credentials
-                  ).asString(context)
-
-                  "BadRequestSignUp" -> UiText.StringResource(
-                    R.string.err_bad_req_sign_up
-                  ).asString(context)
-
-                  else -> UiText.StringResource(R.string.err_signup_trouble)
-                    .asString(context)
-                }
-
-                reduce {
-                  state.copy(
-                    status = UiStatus.Failure(message),
-                    formState = state.formState.copy(
-                      emailError = state.formState.validateEmail(state.formState.email),
-                      passwordError = state.formState.validatePassword(state.formState.password)
-                    )
-                  )
-                }
-
-                postSideEffect(SignUpSideEffect.ShowToast(message))
               }
-            )
-        }
+
+              postSideEffect(SignUpSideEffect.ShowToast(message))
+            }
+          )
       }
     }
   }

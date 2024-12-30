@@ -42,7 +42,7 @@ data class SignInFormState(
       return UiText.StringResource(R.string.err_form_pass_empty)
     }
 
-    if (password.trim().length < 8) {
+    if (password.length < 8) {
       return UiText.StringResource(R.string.err_form_pass_invalid)
     }
 

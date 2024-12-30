@@ -53,7 +53,7 @@ class HomeViewModelTest {
   }
 
   @Test
-  fun `when Get Story Should Not Null and Return Data`() =
+  fun `when get story should not null and return data`() =
     runTest(testDispatcher) {
       val dummyStory = DataDummy.generateDummyStoryResponse()
       val storyPagingData = StoryPagingSource.snapshot(dummyStory)
@@ -75,8 +75,6 @@ class HomeViewModelTest {
       advanceUntilIdle()
       job.cancelAndJoin()
 
-      println("Collected story size: ${actualStory.size}")
-
       val differ = AsyncPagingDataDiffer(
         DIFF_CALLBACK,
         noopListUpdateCallback,
@@ -87,6 +85,39 @@ class HomeViewModelTest {
       Assert.assertNotNull(differ.snapshot())
       Assert.assertEquals(dummyStory.size, differ.snapshot().size)
       Assert.assertEquals(dummyStory[0], differ.snapshot()[0])
+    }
+
+  @Test
+  fun `when get story empty should return no data`() =
+    runTest(testDispatcher) {
+      val storyPagingData = StoryPagingSource.snapshot(emptyList())
+      val expectedStory = flowOf(storyPagingData)
+
+      doReturn(expectedStory).`when`(repository).getStoriesList()
+
+      val viewModel = HomeViewModel(
+        dispatcher = testDispatcher,
+        repository = repository
+      )
+      val actualStory = mutableListOf<PagingData<Story>>()
+      val job = launch(testDispatcher) {
+        viewModel.storiesPaging.collectLatest {
+          actualStory.add(it)
+        }
+      }
+
+      advanceUntilIdle()
+      job.cancelAndJoin()
+
+      val differ = AsyncPagingDataDiffer(
+        DIFF_CALLBACK,
+        noopListUpdateCallback,
+        Dispatchers.Main
+      )
+      differ.submitData(actualStory.first())
+
+      Assert.assertEquals(0, differ.snapshot().size)
+      Assert.assertTrue(differ.snapshot().isEmpty())
     }
 }
 

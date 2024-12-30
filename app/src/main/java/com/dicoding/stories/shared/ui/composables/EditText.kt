@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.dicoding.stories.R
 import com.dicoding.stories.shared.ui.lib.IconResource
 import com.dicoding.stories.shared.ui.lib.UiText
 
@@ -33,10 +34,31 @@ fun EditText(
 ) {
   var passwordVisible by remember { mutableStateOf(false) }
 
+  val fieldValue by remember(key1 = value) { mutableStateOf(value) }
+  var fieldIsError by remember(key1 = isError) { mutableStateOf(isError) }
+  var fieldErrorMessage by remember(key1 = errorMessage) {
+    mutableStateOf(
+      errorMessage
+    )
+  }
+
   OutlinedTextField(
     modifier = modifier,
-    value = value,
-    onValueChange = { onValueChange(it) },
+    value = fieldValue,
+    onValueChange = {
+      if (isPasswordField) {
+        if (it.length < 8) {
+          fieldIsError = true
+          fieldErrorMessage =
+            UiText.StringResource(R.string.err_form_pass_invalid)
+        }
+        if (it.length >= 8) {
+          fieldIsError = false
+          fieldErrorMessage = null
+        }
+      }
+      onValueChange(it)
+    },
     label = {
       Text(
         text = label,
@@ -52,10 +74,10 @@ fun EditText(
     leadingIcon = leadingIconResource?.let {
       { Icon(it.asPainterResource(), contentDescription = null) }
     },
-    isError = isError,
+    isError = fieldIsError,
     supportingText = {
-      if (isError) {
-        errorMessage?.let {
+      if (fieldIsError) {
+        fieldErrorMessage?.let {
           Text(
             modifier = Modifier.fillMaxWidth(),
             text = it.asString(),

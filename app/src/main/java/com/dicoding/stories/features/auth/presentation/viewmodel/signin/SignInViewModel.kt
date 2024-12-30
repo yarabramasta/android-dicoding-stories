@@ -55,54 +55,52 @@ class SignInViewModel @Inject constructor(
     onSuccess: ((Session?) -> Unit)?,
   ) {
     intent {
-      if (state.formState.emailError == null && state.formState.passwordError == null) {
-        reduce { state.copy(status = UiStatus.Loading) }
+      reduce { state.copy(status = UiStatus.Loading) }
 
-        val params = SignInUseCase.Params(
-          email = state.formState.email,
-          password = state.formState.password
-        )
+      val params = SignInUseCase.Params(
+        email = state.formState.email,
+        password = state.formState.password
+      )
 
-        container.scope.launch {
-          signInUseCase(params)
-            .fold(
-              onSuccess = { session ->
-                reduce {
-                  state.copy(
-                    status = UiStatus.Success,
-                    formState = SignInFormState.initial()
-                  )
-                }
-                postSideEffect(SignInSideEffect.OnSubmitSuccessNavigate)
-                postSideEffect(
-                  SignInSideEffect.ShowToast(
-                    UiText
-                      .StringResource(R.string.sign_in_success)
-                      .asString(context)
-                  )
+      container.scope.launch {
+        signInUseCase(params)
+          .fold(
+            onSuccess = { session ->
+              reduce {
+                state.copy(
+                  status = UiStatus.Success,
+                  formState = SignInFormState.initial()
                 )
-
-                onSuccess?.invoke(session)
-              },
-              onFailure = {
-                val message: String = when (it.message) {
-                  "InvalidCredential" -> UiText.StringResource(
-                    R.string.err_invalid_credentials
-                  ).asString(context)
-
-                  "BadRequestSignIn" -> UiText.StringResource(
-                    R.string.err_bad_req_sign_in
-                  ).asString(context)
-
-                  else -> UiText.StringResource(R.string.err_general_trouble)
-                    .asString(context)
-                }
-
-                reduce { state.copy(status = UiStatus.Failure(message)) }
-                postSideEffect(SignInSideEffect.ShowToast(message))
               }
-            )
-        }
+              postSideEffect(SignInSideEffect.OnSubmitSuccessNavigate)
+              postSideEffect(
+                SignInSideEffect.ShowToast(
+                  UiText
+                    .StringResource(R.string.sign_in_success)
+                    .asString(context)
+                )
+              )
+
+              onSuccess?.invoke(session)
+            },
+            onFailure = {
+              val message: String = when (it.message) {
+                "InvalidCredential" -> UiText.StringResource(
+                  R.string.err_invalid_credentials
+                ).asString(context)
+
+                "BadRequestSignIn" -> UiText.StringResource(
+                  R.string.err_bad_req_sign_in
+                ).asString(context)
+
+                else -> UiText.StringResource(R.string.err_general_trouble)
+                  .asString(context)
+              }
+
+              reduce { state.copy(status = UiStatus.Failure(message)) }
+              postSideEffect(SignInSideEffect.ShowToast(message))
+            }
+          )
       }
     }
   }
